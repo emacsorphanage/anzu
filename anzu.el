@@ -41,6 +41,11 @@ First `%d' is current position, second `%d' is total number of matched"
   :type 'string
   :group 'anzu)
 
+(defcustom anzu-mode-line-update-function nil
+  "Function which return mode-line string"
+  :type 'function
+  :group 'anzu)
+
 (defface anzu-mode-line
   '((t (:foreground "magenta" :weight bold)))
   "face of anzu modeline"
@@ -94,9 +99,13 @@ First `%d' is current position, second `%d' is total number of matched"
   (when (anzu--mode-line-not-set-p)
     (setq mode-line-format (cdr mode-line-format))))
 
+(defun anzu--update-mode-line-default (here total)
+  (propertize (format "(%d/%d)" here total) 'face 'anzu-mode-line))
+
 (defun anzu--update-mode-line ()
-  (propertize (format anzu-mode-line-format anzu--current-posion anzu--total-matched)
-              'face 'anzu-mode-line))
+  (let ((update-func (or anzu-mode-line-update-function
+                         'anzu--update-mode-line-default)))
+    (funcall update-func  anzu--current-posion anzu--total-matched)))
 
 ;;;###autoload
 (define-minor-mode anzu-mode
@@ -112,7 +121,8 @@ First `%d' is current position, second `%d' is total number of matched"
         (add-hook 'isearch-mode-end-hook 'anzu--reset-mode-line nil t))
     (remove-hook 'isearch-update-post-hook 'anzu--update t)
     (remove-hook 'isearch-mode-hook 'anzu--cons-mode-line nil t)
-    (remove-hook 'isearch-mode-end-hook 'anzu--reset-mode-line t)))
+    (remove-hook 'isearch-mode-end-hook 'anzu--reset-mode-line t)
+    (anzu--reset-mode-line)))
 
 ;;;###autoload
 (define-global-minor-mode global-anzu-mode
