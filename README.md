@@ -3,7 +3,8 @@
 ## Introduction
 
 `anzu.el` is Emacs port of [anzu.vim](https://github.com/osyo-manga/vim-anzu).
-`anzu.el` shows search point information on mode-line in isearch-mode.
+`anzu.el` provides minor mode which display *current point* and *total matched*
+in various search mode.
 
 
 ## Screenshot
@@ -13,7 +14,7 @@
 
 ## Requirements
 
-* Emacs 23 or higher
+* Emacs 24 or higher
 
 
 ## Basic Usage
@@ -31,3 +32,15 @@ Enable global anzu mode
 #### `anzu-mode-line`
 
 Face of mode-line anzu information
+
+#### `anzu-mode-line-update-function`
+
+Function which constructs mode-line string. If you color mode-line string,
+you propertize string by yourself.
+
+```lisp
+(defun my/update-func (here total)
+  (propertize (format "<%d/%d>" here total)
+              'face '((:foreground "yellow" :weight bold))))
+(setq anzu-mode-line-update-function 'my/update-func)
+```
