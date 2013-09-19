@@ -39,8 +39,18 @@ Function which constructs mode-line string. If you color mode-line string,
 you propertize string by yourself.
 
 ```lisp
-(defun my/update-func (here total)
+(defun my/anzu-update-func (here total)
   (propertize (format "<%d/%d>" here total)
               'face '((:foreground "yellow" :weight bold))))
 (setq anzu-mode-line-update-function 'my/update-func)
+```
+
+## Sample Configuration
+
+```lisp
+(require 'anzu)
+(global-anzu-mode t)
+
+(set-face-attribute 'anzu-mode-line nil
+                    :foreground "yellow" :weight 'bold)
 ```
