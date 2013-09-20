@@ -51,6 +51,11 @@ First `%d' is current position, second `%d' is total number of matched"
   "face of anzu modeline"
   :group 'anzu)
 
+(defvar anzu--total-matched 0)
+(defvar anzu--current-posion 0)
+(defvar anzu--last-isearch-string nil)
+(defvar anzu--cached-positions nil)
+
 (defun anzu--search-all-position (str)
   (save-excursion
     (goto-char (point-min))
@@ -69,11 +74,6 @@ First `%d' is current position, second `%d' is total number of matched"
         when (and (>= here start) (<= here end))
         return i
         finally return 0))
-
-(defvar anzu--total-matched 0)
-(defvar anzu--current-posion 0)
-(defvar anzu--last-isearch-string nil)
-(defvar anzu--cached-positions nil)
 
 (defun anzu--update ()
   (unless (string= isearch-string "")
@@ -121,7 +121,7 @@ First `%d' is current position, second `%d' is total number of matched"
         (add-hook 'isearch-mode-hook 'anzu--cons-mode-line nil t)
         (add-hook 'isearch-mode-end-hook 'anzu--reset-mode-line nil t))
     (remove-hook 'isearch-update-post-hook 'anzu--update t)
-    (remove-hook 'isearch-mode-hook 'anzu--cons-mode-line nil t)
+    (remove-hook 'isearch-mode-hook 'anzu--cons-mode-line t)
     (remove-hook 'isearch-mode-end-hook 'anzu--reset-mode-line t)
     (anzu--reset-mode-line)))
 
