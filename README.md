@@ -45,6 +45,11 @@ you propertize string by yourself.
 (setq anzu-mode-line-update-function 'my/update-func)
 ```
 
+#### `anzu-use-migemo`(Default is `nil`)
+
+Set non-nil` if you use [migemo](https://github.com/emacs-jp/migemo).
+
+
 ## Sample Configuration
 
 ```lisp

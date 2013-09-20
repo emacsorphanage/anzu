@@ -35,6 +35,11 @@
   :type 'string
   :group 'anzu)
 
+(defcustom anzu-use-migemo nil
+  "Flag of using migemo"
+  :type 'boolean
+  :group 'anzu)
+
 (defcustom anzu-mode-line-update-function nil
   "Function which return mode-line string"
   :type 'function
@@ -54,8 +59,11 @@
   (save-excursion
     (goto-char (point-min))
     (let ((positions '())
-          (count 0))
-      (while (re-search-forward str nil t)
+          (count 0)
+          (search-func (if (and anzu-use-migemo migemo-isearch-enable-p)
+                           'migemo-forward
+                         're-search-forward)))
+      (while (funcall search-func str nil t)
         (push (cons (match-beginning 0) (match-end 0)) positions)
         (incf count))
       (let ((result (cons count (reverse positions))))
