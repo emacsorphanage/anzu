@@ -35,12 +35,6 @@
   :type 'string
   :group 'anzu)
 
-(defcustom anzu-mode-line-format "(%s/%s)"
-  "Format string of mode-line. This value should have two `%d'
-First `%d' is current position, second `%d' is total number of matched"
-  :type 'string
-  :group 'anzu)
-
 (defcustom anzu-mode-line-update-function nil
   "Function which return mode-line string"
   :type 'function
