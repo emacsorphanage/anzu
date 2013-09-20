@@ -88,7 +88,8 @@ First `%d' is current position, second `%d' is total number of matched"
        (force-mode-line-update)))))
 
 (defsubst anzu--mode-line-not-set-p ()
-  (equal (car mode-line-format) '(:eval (anzu--update-mode-line))))
+  (and (listp mode-line-format)
+       (equal (car mode-line-format) '(:eval (anzu--update-mode-line)))))
 
 (defun anzu--cons-mode-line ()
   (unless (anzu--mode-line-not-set-p)
