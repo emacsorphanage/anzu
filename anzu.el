@@ -46,6 +46,11 @@
   :type 'string
   :group 'anzu)
 
+(defcustom anzu-cons-mode-line-p t
+  "Set nil if you use your own setting"
+  :type 'boolean
+  :group 'anzu)
+
 (defcustom anzu-use-migemo nil
   "Flag of using migemo"
   :type 'boolean
@@ -105,12 +110,12 @@
        (equal (car mode-line-format) '(:eval (anzu--update-mode-line)))))
 
 (defun anzu--cons-mode-line ()
-  (unless (anzu--mode-line-not-set-p)
+  (when (and anzu-cons-mode-line-p (not (anzu--mode-line-not-set-p)))
     (setq mode-line-format (cons '(:eval (anzu--update-mode-line))
                                  mode-line-format))))
 
 (defun anzu--reset-mode-line ()
-  (when (anzu--mode-line-not-set-p)
+  (when (and anzu-cons-mode-line-p (anzu--mode-line-not-set-p))
     (setq mode-line-format (cdr mode-line-format))))
 
 (defun anzu--update-mode-line-default (here total)
