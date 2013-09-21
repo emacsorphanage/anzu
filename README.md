@@ -45,6 +45,22 @@ you propertize string by yourself.
 (setq anzu-mode-line-update-function 'my/update-func)
 ```
 
+#### `anzu-cons-mode-line-p`(Default is `t`)
+
+Set `nil` if you want to display anzu information at any posion in mode-line.
+`anzu.el` cons search information head of `mode-line` as default.
+
+For example, show search information tail of `minor-mode-alist`
+
+```
+(setq anzu-cons-mode-line-p nil)
+(setcar (cdr (assq 'isearch-mode minor-mode-alist))
+        '(:eval (anzu--update-mode-line)))
+```
+
+![anzu-any-position](image/anzu-any-position.png)
+
+
 #### `anzu-use-migemo`(Default is `nil`)
 
 Set non-nil` if you use [migemo](https://github.com/emacs-jp/migemo).
