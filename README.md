@@ -58,7 +58,8 @@ For example, show search information tail of `minor-mode-alist`
         '(:eval (anzu--update-mode-line)))
 ```
 
-Screenshot
+##### Screenshot
+
 ![anzu-any-position](image/anzu-any-position.png)
 
 
