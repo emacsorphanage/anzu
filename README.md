@@ -17,6 +17,15 @@ in various search mode.
 * Emacs 24 or higher
 
 
+## Installation
+
+You can install `anzu.el` from [MELPA](http://melpa.milkbox.net/) with `package.el`
+
+```
+ M-x package-install anzu
+```
+
+
 ## Basic Usage
 
 #### `anzu-mode`
