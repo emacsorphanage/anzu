@@ -47,7 +47,7 @@
   :group 'anzu)
 
 (defcustom anzu-cons-mode-line-p t
-  "Set nil if you use your own setting"
+  "Set nil if you use your own mode-line setting"
   :type 'boolean
   :group 'anzu)
 

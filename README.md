@@ -67,6 +67,10 @@ For example, show search information tail of `minor-mode-alist`
 
 Set non-nil` if you use [migemo](https://github.com/emacs-jp/migemo).
 
+#### `anzu-mode-lighter`
+
+Default is ` Anzu`.
+
 
 ## Sample Configuration
 
