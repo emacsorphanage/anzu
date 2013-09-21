@@ -52,12 +52,13 @@ Set `nil` if you want to display anzu information at any posion in mode-line.
 
 For example, show search information tail of `minor-mode-alist`
 
-```
+```lisp
 (setq anzu-cons-mode-line-p nil)
 (setcar (cdr (assq 'isearch-mode minor-mode-alist))
         '(:eval (anzu--update-mode-line)))
 ```
 
+Screenshot
 ![anzu-any-position](image/anzu-any-position.png)
 
 
