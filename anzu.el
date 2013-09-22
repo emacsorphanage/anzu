@@ -88,7 +88,8 @@
 (defun anzu--search-all-position (str)
   (unless anzu--last-command
     (setq anzu--last-command last-command))
-  (unless (memq anzu--last-command anzu-regexp-search-commands)
+  (when (and (not (memq anzu--last-command anzu-regexp-search-commands))
+             (not isearch-regexp))
     (setq str (regexp-quote str)))
   (when (anzu--validate-regexp str)
     (save-excursion
