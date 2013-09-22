@@ -71,20 +71,33 @@
 (defvar anzu--last-isearch-string nil)
 (defvar anzu--cached-positions nil)
 
+(defun anzu--validate-regexp (regexp)
+  (condition-case err
+      (progn
+        (string-match-p regexp "")
+        t)
+    (invalid-regexp nil)))
+
 (defun anzu--search-all-position (str)
-  (save-excursion
-    (goto-char (point-min))
-    (let ((positions '())
-          (count 0)
-          (search-func (if (and anzu-use-migemo migemo-isearch-enable-p)
-                           'migemo-forward
-                         're-search-forward)))
-      (while (funcall search-func str nil t)
-        (push (cons (match-beginning 0) (match-end 0)) positions)
-        (incf count))
-      (let ((result (cons count (reverse positions))))
-        (setq anzu--cached-positions (copy-sequence result))
-        result))))
+  (when (anzu--validate-regexp str)
+    (save-excursion
+      (goto-char (point-min))
+      (let ((positions '())
+            (count 0)
+            (finish nil)
+            (search-func (if (and anzu-use-migemo migemo-isearch-enable-p)
+                             'migemo-forward
+                           're-search-forward)))
+        (while (and (not finish) (funcall search-func str nil t))
+          (push (cons (match-beginning 0) (match-end 0)) positions)
+          (incf count)
+          (when (= (match-beginning 0) (match-end 0)) ;; Case of anchor such as "^"
+            (if (eobp)
+                (setq finish t)
+              (forward-char 1))))
+        (let ((result (cons count (reverse positions))))
+          (setq anzu--cached-positions (copy-sequence result))
+          result)))))
 
 (defun anzu--where-is-here (positions here)
   (loop for (start . end) in positions
