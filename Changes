@@ -1,4 +1,10 @@
 Revision history for anzu.el
 
+Revision 0.02 2013/09/22 syohex
+   - Support display search information at any position in mode-line
+     (Suggest by gvol)
+   - Fix case that input is anchor(Report by dakrone)
+   - Improve non regexp search
+
 Revision 0.01 2013/09/20 syohex
    - Initial version
