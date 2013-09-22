@@ -127,7 +127,12 @@
     (setq mode-line-format (cons '(:eval (anzu--update-mode-line))
                                  mode-line-format))))
 
+(defsubst anzu--reset-count ()
+  (setq anzu--total-matched 0
+        anzu--current-posion 0))
+
 (defun anzu--reset-mode-line ()
+  (anzu--reset-count)
   (when (and anzu-cons-mode-line-p (anzu--mode-line-not-set-p))
     (setq mode-line-format (cdr mode-line-format))))
 
