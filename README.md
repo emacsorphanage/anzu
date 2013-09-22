@@ -80,6 +80,13 @@ Set non-nil` if you use [migemo](https://github.com/emacs-jp/migemo).
 
 Default is ` Anzu`.
 
+#### `anzu-regexp-search-commands`
+
+Command which use regexp input. If last command is member of this list,
+`anzu.el` treats input as regular expression.
+
+Default is `'(isearch-forward-regexp isearch-backward-regexp)`.
+
 
 ## Sample Configuration
 
