@@ -61,6 +61,12 @@
   :type 'function
   :group 'anzu)
 
+(defcustom anzu-regexp-search-commands '(isearch-forward-regexp
+                                         isearch-backward-regexp)
+  "Search function which use regexp."
+  :type '(repeat function)
+  :group 'anzu)
+
 (defface anzu-mode-line
   '((t (:foreground "magenta" :weight bold)))
   "face of anzu modeline"
@@ -70,6 +76,7 @@
 (defvar anzu--current-posion 0)
 (defvar anzu--last-isearch-string nil)
 (defvar anzu--cached-positions nil)
+(defvar anzu--last-command nil)
 
 (defun anzu--validate-regexp (regexp)
   (condition-case err
@@ -79,6 +86,10 @@
     (invalid-regexp nil)))
 
 (defun anzu--search-all-position (str)
+  (unless anzu--last-command
+    (setq anzu--last-command last-command))
+  (unless (memq anzu--last-command anzu-regexp-search-commands)
+    (setq str (regexp-quote str)))
   (when (anzu--validate-regexp str)
     (save-excursion
       (goto-char (point-min))
@@ -127,12 +138,13 @@
     (setq mode-line-format (cons '(:eval (anzu--update-mode-line))
                                  mode-line-format))))
 
-(defsubst anzu--reset-count ()
+(defsubst anzu--reset-status ()
   (setq anzu--total-matched 0
-        anzu--current-posion 0))
+        anzu--current-posion 0
+        anzu--last-command nil))
 
 (defun anzu--reset-mode-line ()
-  (anzu--reset-count)
+  (anzu--reset-status)
   (when (and anzu-cons-mode-line-p (anzu--mode-line-not-set-p))
     (setq mode-line-format (cdr mode-line-format))))
 
