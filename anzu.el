@@ -159,7 +159,7 @@
 
 ;;;###autoload
 (define-minor-mode anzu-mode
-  "anzu"
+  "minor-mode which display search information in mode-line."
   :group      'anzu
   :init-value nil
   :global     nil
