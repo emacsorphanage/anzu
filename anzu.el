@@ -21,11 +21,12 @@
 
 ;;; Commentary:
 
-;; `anzu.el' is Port of `anzu.vim'.
+;; `anzu.el' is an Emacs port of `anzu.vim'.
 ;;
-;; `anzu.el' provides minor-mode which display 'current-posion/total matches'
-;; to mode-line in various search modes. You can understand that how many
-;; does your searched word match in current buffer.
+;; `anzu.el' provides a minor mode which displays 'current match/total
+;; matches' in the mode-line in various search modes.  This makes it
+;; easy to understand how many matches there are in the current buffer
+;; for your search query.
 
 ;; To use this package, add following code to your init.el or .emacs
 ;;   (require 'anzu)
