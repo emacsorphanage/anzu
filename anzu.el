@@ -30,7 +30,7 @@
 
 ;; To use this package, add following code to your init.el or .emacs
 ;;   (require 'anzu)
-;;   (global-anzu-mode t)
+;;   (global-anzu-mode +1)
 ;;
 
 ;;; Code:
