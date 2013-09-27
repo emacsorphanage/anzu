@@ -35,7 +35,8 @@
 ;;; Code:
 
 (eval-when-compile
-  (require 'cl))
+  (require 'cl)
+  (defvar migemo-isearch-enable-p))
 
 (defgroup anzu nil
   "Show searched position in mode-line"
