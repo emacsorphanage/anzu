@@ -33,7 +33,7 @@ You can install `anzu.el` from [MELPA](http://melpa.milkbox.net/) with `package.
 Enable anzu minor mode:
 
 ```lisp
-(anzu-mode)
+(anzu-mode +1)
 ```
 
 #### `global-anzu-mode`
@@ -41,7 +41,7 @@ Enable anzu minor mode:
 Enable global anzu mode:
 
 ```lisp
-(global-anzu-mode)
+(global-anzu-mode +1)
 ```
 
 ## Customization
@@ -100,7 +100,7 @@ The default value is `'(isearch-forward-regexp isearch-backward-regexp)`.
 
 ```lisp
 (require 'anzu)
-(global-anzu-mode t)
+(global-anzu-mode +1)
 
 (set-face-attribute 'anzu-mode-line nil
                     :foreground "yellow" :weight 'bold)
