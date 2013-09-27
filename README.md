@@ -2,9 +2,9 @@
 
 ## Introduction
 
-`anzu.el` is Emacs port of [anzu.vim](https://github.com/osyo-manga/vim-anzu).
-`anzu.el` provides minor mode which display *current point* and *total matched*
-in various search mode.
+`anzu.el` is an Emacs port of [anzu.vim](https://github.com/osyo-manga/vim-anzu).
+`anzu.el` provides a minor mode which displays *current match* and *total matches*
+information in the mode-line in various search mode.
 
 
 ## Screenshot
@@ -30,11 +30,19 @@ You can install `anzu.el` from [MELPA](http://melpa.milkbox.net/) with `package.
 
 #### `anzu-mode`
 
-Enable anzu minor mode
+Enable anzu minor mode:
+
+```lisp
+(anzu-mode)
+```
 
 #### `global-anzu-mode`
 
-Enable global anzu mode
+Enable global anzu mode:
+
+```lisp
+(global-anzu-mode)
+```
 
 ## Customization
 
@@ -74,7 +82,7 @@ For example, show search information tail of `minor-mode-alist`
 
 #### `anzu-use-migemo`(Default is `nil`)
 
-Set non-nil` if you use [migemo](https://github.com/emacs-jp/migemo).
+Set to `t` if you use [migemo](https://github.com/emacs-jp/migemo).
 
 #### `anzu-mode-lighter`
 
@@ -82,10 +90,10 @@ Default is ` Anzu`.
 
 #### `anzu-regexp-search-commands`
 
-Command which use regexp input. If last command is member of this list,
+Commands which have regexp input. If the last command is a member of this list,
 `anzu.el` treats input as regular expression.
 
-Default is `'(isearch-forward-regexp isearch-backward-regexp)`.
+The default value is `'(isearch-forward-regexp isearch-backward-regexp)`.
 
 
 ## Sample Configuration
