@@ -1,5 +1,10 @@
 Revision history for anzu.el
 
+Revision 0.04 2013/09/28 syohex
+   Thanks Bozhidar Batsov!!
+   - Improve documentation
+   - Fix byte compile warning
+
 Revision 0.03 2013/09/22 syohex
    - Check isearch-regexp value for checking regexp search
 
