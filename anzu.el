@@ -1,4 +1,4 @@
-;;; anzu.el --- Emacs Port of anzu.vim
+;;; anzu.el --- Show number of matches in mode-line while searching
 
 ;; Copyright (C) 2013 by Syohei YOSHIDA
 
