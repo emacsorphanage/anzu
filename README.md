@@ -80,13 +80,9 @@ For example, show search information tail of `minor-mode-alist`
 ![anzu-any-position](image/anzu-any-position.png)
 
 
-#### `anzu-use-migemo`(Default is `nil`)
-
-Set to `t` if you use [migemo](https://github.com/emacs-jp/migemo).
-
 #### `anzu-mode-lighter`
 
-Default is ` Anzu`.
+Mode name in `mode-line`. Default is ` Anzu`.
 
 #### `anzu-regexp-search-commands`
 
@@ -94,6 +90,16 @@ Commands which have regexp input. If the last command is a member of this list,
 `anzu.el` treats input as regular expression.
 
 The default value is `'(isearch-forward-regexp isearch-backward-regexp)`.
+
+#### `anzu-use-migemo`(Default is `nil`)
+
+Set to `t` if you use [migemo](https://github.com/emacs-jp/migemo).
+
+#### `anzu-minimum-input-length`(Default is 1)
+
+Minimum input length to enable anzu. This parameter is useful for `migemo` users.
+Searching 1 or 2 characters with `migemo` is too heavy if buffer is so large.
+Please set 3 or higher if you frequently edit such file.
 
 
 ## Sample Configuration
