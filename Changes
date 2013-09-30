@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.06 2013/09/30 syohex
+   - Introduce anzu-minimum-input-length
+     This is useful for migemo users
+
 Revision 0.05 2013/09/28 syohex
    Thanks Steve Purcell !!
    - Improve description line
