@@ -53,6 +53,11 @@
   :type 'boolean
   :group 'anzu)
 
+(defcustom anzu-minimum-input-length 1
+  "Minimum input length to enable anzu"
+  :type 'integer
+  :group 'anzu)
+
 (defcustom anzu-use-migemo nil
   "Flag of using migemo"
   :type 'boolean
@@ -121,16 +126,16 @@
         finally return 0))
 
 (defun anzu--update ()
-  (unless (string= isearch-string "")
+  (when (>= (length isearch-string) anzu-minimum-input-length)
     (let ((result (if (string= isearch-string anzu--last-isearch-string)
                       anzu--cached-positions
                     (anzu--search-all-position isearch-string))))
       (let ((total (car result))
             (positions (cdr result)))
-       (setq anzu--total-matched total
-             anzu--current-posion (anzu--where-is-here positions (point))
-             anzu--last-isearch-string isearch-string)
-       (force-mode-line-update)))))
+        (setq anzu--total-matched total
+              anzu--current-posion (anzu--where-is-here positions (point))
+              anzu--last-isearch-string isearch-string)
+        (force-mode-line-update)))))
 
 (defsubst anzu--mode-line-not-set-p ()
   (and (listp mode-line-format)
