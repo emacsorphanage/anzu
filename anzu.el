@@ -58,6 +58,12 @@
   :type 'integer
   :group 'anzu)
 
+(defcustom anzu-search-threshold nil
+  "Limit of search number"
+  :type '(choice (integer :tag "Threshold of search")
+                 (boolean :tag "No threshold" nil))
+  :group 'anzu)
+
 (defcustom anzu-use-migemo nil
   "Flag of using migemo"
   :type 'boolean
@@ -81,6 +87,7 @@
 
 (defvar anzu--total-matched 0)
 (defvar anzu--current-posion 0)
+(defvar anzu--overflow-p nil)
 (defvar anzu--last-isearch-string nil)
 (defvar anzu--cached-positions nil)
 (defvar anzu--last-command nil)
@@ -91,6 +98,9 @@
         (string-match-p regexp "")
         t)
     (invalid-regexp nil)))
+
+(defsubst anzu--construct-position-info (count overflow positions)
+  (list :count count :overflow overflow :positions positions))
 
 (defun anzu--search-all-position (str)
   (unless anzu--last-command
@@ -103,6 +113,7 @@
       (goto-char (point-min))
       (let ((positions '())
             (count 0)
+            (overflow nil)
             (finish nil)
             (search-func (if (and anzu-use-migemo migemo-isearch-enable-p)
                              'migemo-forward
@@ -113,8 +124,10 @@
           (when (= (match-beginning 0) (match-end 0)) ;; Case of anchor such as "^"
             (if (eobp)
                 (setq finish t)
-              (forward-char 1))))
-        (let ((result (cons count (reverse positions))))
+              (forward-char 1)))
+          (when (and anzu-search-threshold (>= count anzu-search-threshold))
+            (setq overflow t finish t)))
+        (let ((result (anzu--construct-position-info count overflow (reverse positions))))
           (setq anzu--cached-positions (copy-sequence result))
           result)))))
 
@@ -130,10 +143,10 @@
     (let ((result (if (string= isearch-string anzu--last-isearch-string)
                       anzu--cached-positions
                     (anzu--search-all-position isearch-string))))
-      (let ((total (car result))
-            (positions (cdr result)))
-        (setq anzu--total-matched total
-              anzu--current-posion (anzu--where-is-here positions (point))
+      (let ((curpos (anzu--where-is-here (plist-get result :positions) (point))))
+        (setq anzu--total-matched (plist-get result :count)
+              anzu--overflow-p (plist-get result :overflow)
+              anzu--current-posion curpos
               anzu--last-isearch-string isearch-string)
         (force-mode-line-update)))))
 
@@ -149,20 +162,29 @@
 (defsubst anzu--reset-status ()
   (setq anzu--total-matched 0
         anzu--current-posion 0
-        anzu--last-command nil))
+        anzu--last-command nil
+        anzu--overflow-p nil))
 
 (defun anzu--reset-mode-line ()
   (anzu--reset-status)
   (when (and anzu-cons-mode-line-p (anzu--mode-line-not-set-p))
     (setq mode-line-format (cdr mode-line-format))))
 
+(defsubst anzu--format-here-position (here total)
+  (if (and anzu--overflow-p (zerop here))
+      (format "%d+" total)
+    here))
+
 (defun anzu--update-mode-line-default (here total)
-  (propertize (format "(%d/%d)" here total) 'face 'anzu-mode-line))
+  (propertize (format "(%s/%d%s)"
+                      (anzu--format-here-position here total)
+                      total (if anzu--overflow-p "+" ""))
+              'face 'anzu-mode-line))
 
 (defun anzu--update-mode-line ()
   (let ((update-func (or anzu-mode-line-update-function
                          'anzu--update-mode-line-default)))
-    (funcall update-func  anzu--current-posion anzu--total-matched)))
+    (funcall update-func anzu--current-posion anzu--total-matched)))
 
 ;;;###autoload
 (define-minor-mode anzu-mode
