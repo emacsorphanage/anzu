@@ -98,8 +98,10 @@ Set to `t` if you use [migemo](https://github.com/emacs-jp/migemo).
 #### `anzu-search-threshold`(Default is `nil`)
 
 Threshold of searched words. If there are searched word more than this value,
-`anzu.el` stops to search and display total number like `1000+` as default.
+`anzu.el` stops to search and display total number like `1000+`(as default).
 If this value is `nil`, `anzu.el` counts all words.
+
+![anzu-threshold](image/anzu-threshold.png)
 
 
 #### `anzu-minimum-input-length`(Default is 1)
@@ -117,4 +119,6 @@ Please set 3 or higher if you frequently edit such file.
 
 (set-face-attribute 'anzu-mode-line nil
                     :foreground "yellow" :weight 'bold)
+
+(setq anzu-search-threshold 1000)
 ```
