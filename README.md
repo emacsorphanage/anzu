@@ -95,6 +95,13 @@ The default value is `'(isearch-forward-regexp isearch-backward-regexp)`.
 
 Set to `t` if you use [migemo](https://github.com/emacs-jp/migemo).
 
+#### `anzu-search-threshold`(Default is `nil`)
+
+Threshold of searched words. If there are searched word more than this value,
+`anzu.el` stops to search and display total number like `1000+` as default.
+If this value is `nil`, `anzu.el` counts all words.
+
+
 #### `anzu-minimum-input-length`(Default is 1)
 
 Minimum input length to enable anzu. This parameter is useful for `migemo` users.
