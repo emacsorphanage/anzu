@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.07 2013/10/01 syohex
+   - Introduce anzu-search-threshold
+
 Revision 0.06 2013/09/30 syohex
    - Introduce anzu-minimum-input-length
      This is useful for migemo users
