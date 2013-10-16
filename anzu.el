@@ -4,7 +4,7 @@
 
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; URL: https://github.com/syohex/emacs-anzu
-;; Version: 0.07
+;; Version: 0.08
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -109,7 +109,7 @@
              (not isearch-regexp))
     (setq str (regexp-quote str)))
   (if (not (anzu--validate-regexp str))
-      anzu--cached-positions      
+      anzu--cached-positions
     (save-excursion
       (goto-char (point-min))
       (let ((positions '())

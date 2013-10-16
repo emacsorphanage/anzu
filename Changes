@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.08 2013/10/16 syohex
+   - Fix that error message is displayed when regexp validation is failed
+
 Revision 0.07 2013/10/01 syohex
    - Introduce anzu-search-threshold
 
