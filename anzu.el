@@ -108,7 +108,8 @@
   (when (and (not (memq anzu--last-command anzu-regexp-search-commands))
              (not isearch-regexp))
     (setq str (regexp-quote str)))
-  (when (anzu--validate-regexp str)
+  (if (not (anzu--validate-regexp str))
+      anzu--cached-positions      
     (save-excursion
       (goto-char (point-min))
       (let ((positions '())
