@@ -80,6 +80,11 @@
   :type '(repeat function)
   :group 'anzu)
 
+(defcustom anzu-input-idle-delay 0.05
+  "Idle second for updating modeline at replace commands"
+  :type 'number
+  :group 'anzu)
+
 (defface anzu-mode-line
   '((t (:foreground "magenta" :weight bold)))
   "face of anzu modeline"
@@ -91,6 +96,10 @@
 (defvar anzu--last-isearch-string nil)
 (defvar anzu--cached-positions nil)
 (defvar anzu--last-command nil)
+(defvar anzu--state nil)
+(defvar anzu--cached-count 0)
+(defvar anzu--replace-begin nil)
+(defvar anzu--replace-end nil)
 
 (defun anzu--validate-regexp (regexp)
   (condition-case err
@@ -155,7 +164,11 @@
   (and (listp mode-line-format)
        (equal (car mode-line-format) '(:eval (anzu--update-mode-line)))))
 
-(defun anzu--cons-mode-line ()
+(defun anzu--cons-mode-line-search ()
+  (anzu--cons-mode-line 'search))
+
+(defun anzu--cons-mode-line (state)
+  (setq anzu--state state)
   (when (and anzu-cons-mode-line-p (not (anzu--mode-line-not-set-p)))
     (setq mode-line-format (cons '(:eval (anzu--update-mode-line))
                                  mode-line-format))))
@@ -177,10 +190,14 @@
     here))
 
 (defun anzu--update-mode-line-default (here total)
-  (propertize (format "(%s/%d%s)"
-                      (anzu--format-here-position here total)
-                      total (if anzu--overflow-p "+" ""))
-              'face 'anzu-mode-line))
+  (case anzu--state
+    (search (propertize (format "(%s/%d%s)"
+                                (anzu--format-here-position here total)
+                                total (if anzu--overflow-p "+" ""))
+                        'face 'anzu-mode-line))
+    (replace (propertize (format "(%d matches)" total)
+                         'face 'anzu-mode-line))
+    (otherwise "")))
 
 (defun anzu--update-mode-line ()
   (let ((update-func (or anzu-mode-line-update-function
@@ -197,7 +214,7 @@
   (if anzu-mode
       (progn
         (add-hook 'isearch-update-post-hook 'anzu--update nil t)
-        (add-hook 'isearch-mode-hook 'anzu--cons-mode-line nil t)
+        (add-hook 'isearch-mode-hook 'anzu--cons-mode-line-search nil t)
         (add-hook 'isearch-mode-end-hook 'anzu--reset-mode-line nil t))
     (remove-hook 'isearch-update-post-hook 'anzu--update t)
     (remove-hook 'isearch-mode-hook 'anzu--cons-mode-line t)
@@ -211,6 +228,107 @@
     (unless (minibufferp)
       (anzu-mode t)))
   :group 'anzu)
+
+(defsubst anzu--query-prompt-base (use-region use-regexp)
+  (concat "Query replace"
+          (if current-prefix-arg " word" "")
+          (if use-regexp " regexp" "")
+          (if use-region " in region" ""))  )
+
+(defun anzu--query-prompt (use-region use-regexp)
+  (let ((prompt (anzu--query-prompt-base use-region use-regexp)))
+    (if query-replace-defaults
+        (format "%s (default %s -> %s) " prompt
+                (query-replace-descr (car query-replace-defaults))
+                (query-replace-descr (cdr query-replace-defaults)))
+      prompt)))
+
+(defun anzu--count-matched (buf str use-regexp)
+  (when (not use-regexp)
+    (setq str (regexp-quote str)))
+  (if (not (anzu--validate-regexp str))
+      anzu--cached-count
+    (with-current-buffer buf
+      (setq anzu--cached-count
+            (how-many str anzu--replace-begin anzu--replace-end)))))
+
+(defun anzu--check-minibuffer-input (buf use-regexp)
+  (let ((matched (anzu--count-matched buf (minibuffer-contents) use-regexp)))
+    (setq anzu--total-matched matched)
+    (force-mode-line-update)))
+
+(defun anzu--read-from-string (prompt use-regexp)
+  (let ((curbuf (current-buffer))
+        (timer nil))
+    (unwind-protect
+        (minibuffer-with-setup-hook
+            #'(lambda ()
+                (setq timer (run-with-idle-timer
+                             (max anzu-input-idle-delay 0.01)
+                             'repeat
+                             (lambda ()
+                               (with-selected-window (or (active-minibuffer-window)
+                                                         (minibuffer-window))
+                                 (anzu--check-minibuffer-input curbuf use-regexp))))))
+          (read-from-minibuffer (format "%s: " prompt)
+                                nil nil nil
+                                query-replace-from-history-variable nil t))
+      (when timer
+        (cancel-timer timer)
+        (setq timer nil)))))
+
+(defun anzu--query-validate-from-regexp (from)
+  (when (string-match "\\(?:\\`\\|[^\\]\\)\\(?:\\\\\\\\\\)*\\(\\\\[nt]\\)" from)
+    (let ((match (match-string 1 from)))
+      (cond
+       ((string= match "\\n")
+        (message "`\\n' here doesn't match a newline; type C-q C-j instead!!"))
+       ((string= match "\\t")
+        (message "\\t' here doesn't match a tab; to do that, just type TAB!!")))
+      (sit-for 2))))
+
+(defun anzu--query-from-string (prompt use-regexp)
+  (let ((from (anzu--read-from-string prompt use-regexp)))
+    (if (and (string= from "") query-replace-defaults)
+        (cons (car query-replace-defaults)
+              (query-replace-compile-replacement
+               (cdr query-replace-defaults) use-regexp))
+      (add-to-history query-replace-from-history-variable from nil t)
+      (when use-regexp
+        (anzu--query-validate-from-regexp from))
+      from)))
+
+(defsubst anzu--set-region-information (beg end)
+  (setq anzu--replace-begin beg
+        anzu--replace-end end))
+
+(defun anzu--query-replace-common (use-regexp)
+  (anzu--cons-mode-line 'replace)
+  (let* ((use-region (use-region-p))
+         (beg (and use-region (region-beginning)))
+         (end (and use-region (region-end)))
+         (prompt (anzu--query-prompt use-region use-regexp))
+         (delimited current-prefix-arg))
+    (unwind-protect
+        (let* ((from (anzu--query-from-string prompt use-regexp))
+               (to (if (consp from)
+                       (prog1 (cdr from) (setq from (car from)))
+                     (query-replace-read-to from prompt use-regexp))))
+          (if use-regexp
+              (perform-replace from to t t delimited nil nil beg end)
+            (query-replace from to delimited beg end)))
+      (progn
+        (anzu--reset-mode-line)
+        (force-mode-line-update)))))
+
+;;;###autoload
+(defun anzu-query-replace ()
+  (interactive)
+  (anzu--query-replace-common nil))
+
+(defun anzu-query-replace-regexp ()
+  (interactive)
+  (anzu--query-replace-common t))
 
 (provide 'anzu)
 ;;; anzu.el ends here
