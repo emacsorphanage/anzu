@@ -44,6 +44,22 @@ Enable global anzu mode:
 (global-anzu-mode +1)
 ```
 
+#### `anzu-query-replace`
+
+Same as `query-replace` except anzu information in mode-line
+
+#### `anzu-query-replace-regexp`
+
+Same as `query-replace-regexp` except anzu information in mode-line
+
+
+Add following S-exp in your configuration if you use anzu replace commands as default.
+
+```lisp
+(global-set-key (kbd "M-%") 'anzu-query-replace)
+(global-set-key (kbd "C-M-%") 'anzu-query-replace-regexp)
+```
+
 ## Customization
 
 #### `anzu-mode-line`
@@ -83,6 +99,11 @@ For example, show search information tail of `minor-mode-alist`
 #### `anzu-mode-lighter`
 
 Mode name in `mode-line`. Default is ` Anzu`.
+
+
+#### `anzu-input-idle-delay`(Default is `0.05`)
+
+Delay second of updating modeline information when you input from-string
 
 #### `anzu-regexp-search-commands`
 
