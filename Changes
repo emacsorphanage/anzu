@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.09 2013/10/19 syohex
+   - Implement 'anzu-replace-query' and 'anzu-replace-query-regexp'
+
 Revision 0.08 2013/10/16 syohex
    - Fix that error message is displayed when regexp validation is failed
 
