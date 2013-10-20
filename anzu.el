@@ -44,7 +44,7 @@
   :group 'isearch)
 
 (defcustom anzu-mode-lighter " Anzu"
-  "Lighter of anzo-mode"
+  "Lighter of anzu-mode"
   :type 'string
   :group 'anzu)
 
