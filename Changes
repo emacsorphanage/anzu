@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.10 2013/10/20 syohex
+   - Add feature that highlight replaced texts
+
 Revision 0.09 2013/10/19 syohex
    - Implement 'anzu-replace-query' and 'anzu-replace-query-regexp'
 
