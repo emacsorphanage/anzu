@@ -201,7 +201,7 @@
                                 (anzu--format-here-position here total)
                                 total (if anzu--overflow-p "+" ""))
                         'face 'anzu-mode-line))
-    (replace (propertize (format "(%d matches)" total)
+    (replace (propertize (format "(%d replace)" total)
                          'face 'anzu-mode-line))
     (otherwise "")))
 
