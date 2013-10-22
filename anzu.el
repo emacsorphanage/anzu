@@ -103,9 +103,6 @@
 (defvar anzu--last-command nil)
 (defvar anzu--state nil)
 (defvar anzu--cached-count 0)
-(defvar anzu--replace-begin nil)
-(defvar anzu--replace-end nil)
-(defvar anzu--window-height 0)
 
 (defun anzu--validate-regexp (regexp)
   (condition-case err
@@ -258,23 +255,23 @@
   (let ((case-fold-search nil))
     (not (string-match-p "[A-Z]" input))))
 
-(defun anzu--count-matched (buf str use-regexp)
+(defun anzu--count-matched (buf str replace-beg replace-end use-regexp window-height)
   (when (not use-regexp)
     (setq str (regexp-quote str)))
   (if (not (anzu--validate-regexp str))
       anzu--cached-count
     (with-current-buffer buf
       (save-excursion
-        (let* ((overlay-beg anzu--replace-begin)
+        (let* ((overlay-beg replace-beg)
                (overlay-end (min (save-excursion
-                                   (forward-line anzu--window-height)
+                                   (forward-line window-height)
                                    (point))
-                                 anzu--replace-end)))
-          (goto-char anzu--replace-begin)
+                                 replace-end)))
+          (goto-char overlay-beg)
           (let ((count 0)
                 (finish nil)
                 (case-fold-search (anzu--case-fold-search str)))
-            (while (and (not finish) (re-search-forward str anzu--replace-end t))
+            (while (and (not finish) (re-search-forward str replace-end t))
               (incf count)
               (let ((beg (match-beginning 0))
                     (end (match-end 0)))
@@ -286,13 +283,13 @@
                     (anzu--add-overlay beg end)))))
             (setq anzu--cached-count count)))))))
 
-(defun anzu--check-minibuffer-input (buf use-regexp)
-  (let ((content (minibuffer-contents)))
-    (let ((matched (if (string= content "")
-                       (setq anzu--cached-count 0)
-                     (anzu--count-matched buf content use-regexp))))
-      (setq anzu--total-matched matched)
-      (force-mode-line-update))))
+(defun anzu--check-minibuffer-input (buf beg end use-regexp window-height)
+  (let* ((content (minibuffer-contents))
+         (matched (if (string= content "")
+                      (setq anzu--cached-count 0)
+                    (anzu--count-matched buf content beg end use-regexp window-height))))
+    (setq anzu--total-matched matched)
+    (force-mode-line-update)))
 
 (defun anzu--clear-overlays (buf beg end)
   (with-current-buffer buf
@@ -300,7 +297,7 @@
       (when (overlay-get ov 'anzu-replace)
         (delete-overlay ov)))))
 
-(defun anzu--read-from-string (prompt use-regexp)
+(defun anzu--read-from-string (prompt beg end use-regexp window-height)
   (let ((curbuf (current-buffer))
         (timer nil))
     (unwind-protect
@@ -313,7 +310,8 @@
                                (anzu--clear-overlays curbuf nil nil)
                                (with-selected-window (or (active-minibuffer-window)
                                                          (minibuffer-window))
-                                 (anzu--check-minibuffer-input curbuf use-regexp))))))
+                                 (anzu--check-minibuffer-input
+                                  curbuf beg end use-regexp window-height))))))
           (read-from-minibuffer (format "%s: " prompt)
                                 nil nil nil
                                 query-replace-from-history-variable nil t))
@@ -331,8 +329,8 @@
         (message "\\t' here doesn't match a tab; to do that, just type TAB!!")))
       (sit-for 2))))
 
-(defun anzu--query-from-string (prompt use-regexp)
-  (let ((from (anzu--read-from-string prompt use-regexp)))
+(defun anzu--query-from-string (prompt beg end use-regexp window-height)
+  (let ((from (anzu--read-from-string prompt beg end use-regexp window-height)))
     (if (and (string= from "") query-replace-defaults)
         (cons (car query-replace-defaults)
               (query-replace-compile-replacement
@@ -342,23 +340,18 @@
         (anzu--query-validate-from-regexp from))
       from)))
 
-(defsubst anzu--set-region-information (beg end)
-  (setq anzu--replace-begin beg
-        anzu--replace-end end))
-
 (defun anzu--query-replace-common (use-regexp)
-  (setq anzu--window-height (window-height))
   (anzu--cons-mode-line 'replace)
   (let* ((use-region (use-region-p))
+         (window-height (window-height))
          (beg (if use-region (region-beginning) (point)))
          (end (if use-region (region-end) (point-max)))
          (prompt (anzu--query-prompt use-region use-regexp))
          (delimited current-prefix-arg)
          (curbuf (current-buffer))
          (clear-overlay nil))
-    (anzu--set-region-information beg end)
     (unwind-protect
-        (let* ((from (anzu--query-from-string prompt use-regexp))
+        (let* ((from (anzu--query-from-string prompt beg end use-regexp window-height))
                (to (if (consp from)
                        (prog1 (cdr from) (setq from (car from)))
                      (query-replace-read-to from prompt use-regexp))))
