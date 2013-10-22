@@ -66,6 +66,10 @@ Add following S-exp in your configuration if you use anzu replace commands as de
 
 Face of mode-line anzu information
 
+#### `anzu-replace-highlight`
+
+Face of replaced text
+
 #### `anzu-mode-line-update-function`
 
 Function which constructs mode-line string. If you color mode-line string,

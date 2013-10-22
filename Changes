@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.12 2013/10/21 syohex
+   - Re-factoring: reduce global variables
+
 Revision 0.11 2013/10/21 syohex
    - Change mode-line message at replace commands
 
