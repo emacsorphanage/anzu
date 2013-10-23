@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.13 2013/10/23 syohex
+   - Add feature like evil's replacement
+
 Revision 0.12 2013/10/21 syohex
    - Re-factoring: reduce global variables
 
