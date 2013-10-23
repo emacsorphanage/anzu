@@ -68,7 +68,11 @@ Face of mode-line anzu information
 
 #### `anzu-replace-highlight`
 
-Face of replaced text
+Face of from-string of replacement
+
+#### `anzu-replace-to`
+
+Face of to-string of replacement
 
 #### `anzu-mode-line-update-function`
 
