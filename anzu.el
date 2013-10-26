@@ -39,6 +39,8 @@
   (require 'cl)
   (defvar migemo-isearch-enable-p))
 
+(require 'thingatpt)
+
 (defgroup anzu nil
   "Show searched position in mode-line"
   :group 'isearch)
@@ -405,18 +407,34 @@
     (forward-line 1)
     (point)))
 
-(defun anzu--query-replace-common (use-regexp)
+(defun anzu--query-from-at-cursor (prompt buf beg end overlay-limit)
+  (let ((symbol (thing-at-point 'symbol)))
+    (setq anzu--total-matched
+          (anzu--count-matched buf symbol beg end nil overlay-limit))
+    (force-mode-line-update)
+    symbol))
+
+(defun anzu--symbol-begin ()
+  (let ((bound (bounds-of-thing-at-point 'symbol)))
+    (and bound (car bound))))
+
+(defun anzu--query-replace-common (use-regexp &optional at-cursor)
   (anzu--cons-mode-line 'replace)
   (let* ((use-region (use-region-p))
          (overlay-limit (anzu--overlay-limit))
          (beg (if use-region (region-beginning) (point)))
          (end (if use-region (region-end) (point-max)))
          (prompt (anzu--query-prompt use-region use-regexp))
+         (symbol-beg (and at-cursor (anzu--symbol-begin)))
          (delimited current-prefix-arg)
          (curbuf (current-buffer))
          (clear-overlay nil))
     (unwind-protect
-        (let* ((from (anzu--query-from-string prompt beg end use-regexp overlay-limit))
+        (let* ((from (if symbol-beg
+                         (progn
+                           (setq beg symbol-beg)
+                           (anzu--query-from-at-cursor prompt curbuf beg end overlay-limit))
+                       (anzu--query-from-string prompt beg end use-regexp overlay-limit)))
                (to (if (consp from)
                        (prog1 (cdr from) (setq from (car from)))
                      (anzu--query-replace-read-to
@@ -431,6 +449,11 @@
           (anzu--clear-overlays curbuf beg end))
         (anzu--reset-mode-line)
         (force-mode-line-update)))))
+
+;;;###autoload
+(defun anzu-query-replace-at-cursor ()
+  (interactive)
+  (anzu--query-replace-common nil t))
 
 ;;;###autoload
 (defun anzu-query-replace ()
