@@ -257,8 +257,10 @@
                 (query-replace-descr (cdr query-replace-defaults)))
       prompt)))
 
-(defun anzu--add-overlay (beg end)
+(defun anzu--add-overlay (regexp beg end)
   (let ((ov (make-overlay beg end)))
+    (overlay-put ov 'from-regexp regexp)
+    (overlay-put ov 'from-string (buffer-substring-no-properties beg end))
     (overlay-put ov 'face 'anzu-replace-highlight)
     (overlay-put ov 'anzu-replace t)))
 
@@ -288,7 +290,7 @@
                         (setq finish t)
                       (forward-char 1))
                   (when (and (>= beg overlay-beg) (<= end overlay-end))
-                    (anzu--add-overlay beg end)))))
+                    (anzu--add-overlay str beg end)))))
             (setq anzu--cached-count count)))))))
 
 (defun anzu--check-minibuffer-input (buf beg end use-regexp overlay-limit)
@@ -356,6 +358,18 @@
           ((and (consp compiled) (stringp (car compiled)))
            (car compiled)))))
 
+(defun anzu--evaluate-occurrence (ov to-regexp)
+  (let ((from-regexp (overlay-get ov 'from-regexp))
+        (from-string (overlay-get ov 'from-string)))
+    (with-temp-buffer
+      (insert from-string)
+      (goto-char (point-min))
+      (if (re-search-forward from-regexp nil t)
+          (progn
+            (replace-match to-regexp)
+            (buffer-substring-no-properties (point-min) (point-max)))
+        to-regexp))))
+
 (defun anzu--append-replaced-string (buf beg end use-regexp overlay-limit)
   (let ((content (minibuffer-contents)))
     (unless (string= content anzu--last-replace-input)
@@ -365,8 +379,9 @@
               (replace (anzu--calculate-replace-text content use-regexp)))
           (dolist (ov (overlays-in beg overlay-end))
             (when (overlay-get ov 'anzu-replace)
-              (overlay-put ov 'after-string
-                           (propertize replace 'face 'anzu-replace-to)))))))))
+              (let ((replace-evaled (anzu--evaluate-occurrence ov replace)))
+                (overlay-put ov 'after-string
+                             (propertize replace-evaled 'face 'anzu-replace-to))))))))))
 
 (defun anzu--read-to-string (from prompt beg end use-regexp overlay-limit)
   (let ((curbuf (current-buffer))
