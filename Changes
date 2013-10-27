@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.16 2013/10/27 syohex
+   - Improve for performance at not regexp replace command
+
 Revision 0.15 2013/10/26 syohex
    - Improve replacement commands
 
