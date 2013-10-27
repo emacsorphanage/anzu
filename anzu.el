@@ -379,7 +379,9 @@
               (replace (anzu--calculate-replace-text content use-regexp)))
           (dolist (ov (overlays-in beg overlay-end))
             (when (overlay-get ov 'anzu-replace)
-              (let ((replace-evaled (anzu--evaluate-occurrence ov replace)))
+              (let ((replace-evaled (if use-regexp
+                                        (anzu--evaluate-occurrence ov replace)
+                                      replace)))
                 (overlay-put ov 'after-string
                              (propertize replace-evaled 'face 'anzu-replace-to))))))))))
 
