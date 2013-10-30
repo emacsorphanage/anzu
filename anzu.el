@@ -87,6 +87,11 @@
   :type 'number
   :group 'anzu)
 
+(defcustom anzu-deactivate-region nil
+  "Deactive region if you use anzu a replace command with region"
+  :type 'boolean
+  :group 'anzu)
+
 (defface anzu-mode-line
   '((t (:foreground "magenta" :weight bold)))
   "face of anzu modeline"
@@ -447,6 +452,8 @@
          (delimited current-prefix-arg)
          (curbuf (current-buffer))
          (clear-overlay nil))
+    (when (and anzu-deactivate-region use-region)
+      (deactivate-mark t))
     (unwind-protect
         (let* ((from (if symbol-beg
                          (progn
