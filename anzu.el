@@ -431,9 +431,10 @@
     (point)))
 
 (defun anzu--query-from-at-cursor (prompt buf beg end overlay-limit)
-  (let ((symbol (thing-at-point 'symbol)))
+  (let* ((symbol (thing-at-point 'symbol))
+         (symbol-regexp (concat "\\b" (regexp-quote symbol) "\\b")))
     (setq anzu--total-matched
-          (anzu--count-matched buf symbol beg end nil overlay-limit))
+          (anzu--count-matched buf symbol-regexp beg end t overlay-limit))
     (force-mode-line-update)
     symbol))
 
@@ -457,7 +458,8 @@
     (unwind-protect
         (let* ((from (if symbol-beg
                          (progn
-                           (setq beg symbol-beg)
+                           (setq beg symbol-beg
+                                 delimited nil)
                            (anzu--query-from-at-cursor prompt curbuf beg end overlay-limit))
                        (anzu--query-from-string prompt beg end use-regexp overlay-limit)))
                (to (if (consp from)
