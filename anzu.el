@@ -125,6 +125,10 @@
 (defsubst anzu--construct-position-info (count overflow positions)
   (list :count count :overflow overflow :positions positions))
 
+(defsubst anzu--case-fold-search (input)
+  (let ((case-fold-search nil))
+    (not (string-match-p "[A-Z]" input))))
+
 (defun anzu--search-all-position (str)
   (unless anzu--last-command
     (setq anzu--last-command last-command))
@@ -141,7 +145,8 @@
             (finish nil)
             (search-func (if (and anzu-use-migemo migemo-isearch-enable-p)
                              'migemo-forward
-                           're-search-forward)))
+                           're-search-forward))
+            (case-fold-search (anzu--case-fold-search str)))
         (while (and (not finish) (funcall search-func str nil t))
           (push (cons (match-beginning 0) (match-end 0)) positions)
           (incf count)
@@ -263,10 +268,6 @@
     (overlay-put ov 'from-string (buffer-substring-no-properties beg end))
     (overlay-put ov 'face 'anzu-replace-highlight)
     (overlay-put ov 'anzu-replace t)))
-
-(defsubst anzu--case-fold-search (input)
-  (let ((case-fold-search nil))
-    (not (string-match-p "[A-Z]" input))))
 
 (defun anzu--count-matched (buf str replace-beg replace-end use-regexp overlay-limit)
   (when (not use-regexp)
