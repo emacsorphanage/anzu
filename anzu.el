@@ -487,6 +487,7 @@
   (interactive)
   (anzu--query-replace-common nil))
 
+;;;###autoload
 (defun anzu-query-replace-regexp ()
   (interactive)
   (anzu--query-replace-common t))
