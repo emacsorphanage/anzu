@@ -436,12 +436,14 @@
     (point)))
 
 (defun anzu--query-from-at-cursor (prompt buf beg end overlay-limit)
-  (let* ((symbol (thing-at-point 'symbol))
-         (symbol-regexp (concat "\\_<" (regexp-quote symbol) "\\_>")))
-    (setq anzu--total-matched
-          (anzu--count-matched buf symbol-regexp beg end t overlay-limit))
-    (force-mode-line-update)
-    symbol))
+  (let ((symbol (thing-at-point 'symbol)))
+    (unless symbol
+      (error "No symbol at cursor!!"))
+    (let ((symbol-regexp (concat "\\_<" (regexp-quote symbol) "\\_>")))
+      (setq anzu--total-matched
+            (anzu--count-matched buf symbol-regexp beg end t overlay-limit))
+      (force-mode-line-update)
+      symbol)))
 
 (defun anzu--thing-begin (thing)
   (let ((bound (bounds-of-thing-at-point thing)))
