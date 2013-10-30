@@ -64,6 +64,11 @@ Add following S-exp in your configuration if you use anzu replace commands as de
 
 Same as `anzu-query-replace` except *from-string* is symbol at cursor
 
+#### `anzu-query-replace-at-cursor-thing`
+
+Same as `anzu-query-replace-at-cursor` except replaced region is
+specified by `anzu-replace-at-cursor-thing`.
+
 
 ## Customization
 
@@ -143,6 +148,17 @@ If this value is `nil`, `anzu.el` counts all words.
 Minimum input length to enable anzu. This parameter is useful for `migemo` users.
 Searching 1 or 2 characters with `migemo` is too heavy if buffer is so large.
 Please set 3 or higher if you frequently edit such file.
+
+#### `anzu-deactivate-region`(Default is `nil`)
+
+Deactivate region at anzu replace command if this value is non-nil.
+It is hard to see with anzu replace command when region is active.
+
+
+#### `anzu-replace-at-cursor-thing`(Default is 'defun)
+
+Thing at point of `anzu-query-replace-at-cursor-thing`.
+This parameter is same as `thing-at-point`.
 
 
 ## Sample Configuration
