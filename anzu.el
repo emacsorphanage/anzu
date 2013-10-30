@@ -92,6 +92,11 @@
   :type 'boolean
   :group 'anzu)
 
+(defcustom anzu-replace-at-cursor-thing 'defun
+  "Replace thing. This parameter is same as `thing-at-point'"
+  :type 'symbol
+  :group 'anzu)
+
 (defface anzu-mode-line
   '((t (:foreground "magenta" :weight bold)))
   "face of anzu modeline"
@@ -432,34 +437,55 @@
 
 (defun anzu--query-from-at-cursor (prompt buf beg end overlay-limit)
   (let* ((symbol (thing-at-point 'symbol))
-         (symbol-regexp (concat "\\b" (regexp-quote symbol) "\\b")))
+         (symbol-regexp (concat "\\_<" (regexp-quote symbol) "\\_>")))
     (setq anzu--total-matched
           (anzu--count-matched buf symbol-regexp beg end t overlay-limit))
     (force-mode-line-update)
     symbol))
 
-(defun anzu--symbol-begin ()
-  (let ((bound (bounds-of-thing-at-point 'symbol)))
+(defun anzu--thing-begin (thing)
+  (let ((bound (bounds-of-thing-at-point thing)))
     (and bound (car bound))))
 
-(defun anzu--query-replace-common (use-regexp &optional at-cursor)
+(defun anzu--thing-end (thing)
+  (let ((bound (bounds-of-thing-at-point thing)))
+    (and bound (cdr bound))))
+
+(defun anzu--region-begin (use-region thing)
+  (if thing
+      (or (anzu--thing-begin thing) (point))
+    (if use-region
+        (region-beginning)
+      (point))))
+
+(defun anzu--region-end (use-region thing)
+  (if thing
+      (or (anzu--thing-end thing) (point-max))
+    (if use-region
+        (region-end)
+      (point-max))))
+
+(defun anzu--begin-thing (at-cursor thing)
+  (cond ((and at-cursor thing) thing)
+        ((and at-cursor (not thing)) 'symbol)
+        (t nil)))
+
+(defun anzu--query-replace-common (use-regexp &optional at-cursor thing)
   (anzu--cons-mode-line 'replace)
   (let* ((use-region (use-region-p))
          (overlay-limit (anzu--overlay-limit))
-         (beg (if use-region (region-beginning) (point)))
-         (end (if use-region (region-end) (point-max)))
+         (beg (anzu--region-begin use-region (anzu--begin-thing at-cursor thing)))
+         (end (anzu--region-end use-region thing))
          (prompt (anzu--query-prompt use-region use-regexp))
-         (symbol-beg (and at-cursor (anzu--symbol-begin)))
          (delimited current-prefix-arg)
          (curbuf (current-buffer))
          (clear-overlay nil))
     (when (and anzu-deactivate-region use-region)
       (deactivate-mark t))
     (unwind-protect
-        (let* ((from (if symbol-beg
+        (let* ((from (if (and at-cursor beg)
                          (progn
-                           (setq beg symbol-beg
-                                 delimited nil)
+                           (setq delimited nil)
                            (anzu--query-from-at-cursor prompt curbuf beg end overlay-limit))
                        (anzu--query-from-string prompt beg end use-regexp overlay-limit)))
                (to (if (consp from)
@@ -480,7 +506,12 @@
 ;;;###autoload
 (defun anzu-query-replace-at-cursor ()
   (interactive)
-  (anzu--query-replace-common nil t))
+  (anzu--query-replace-common t t))
+
+;;;###autoload
+(defun anzu-query-replace-at-cursor-thing ()
+  (interactive)
+  (anzu--query-replace-common t t anzu-replace-at-cursor-thing))
 
 ;;;###autoload
 (defun anzu-query-replace ()
