@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.18 2013/10/30 syohex
+   - Add switch of deactivate region feature
+   - Improve anzu-query-replace-at-cursor behavior
+
 Revision 0.17 2013/10/28 syohex
    - Fix case fold issue
 
