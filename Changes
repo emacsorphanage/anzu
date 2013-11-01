@@ -1,5 +1,10 @@
 Revision history for anzu.el
 
+Revision 0.20 2013/11/01 syohex
+   - Fix case of 0 width match such as '^', '$'
+   - Improve replace commands(We can use \#, \1 in \,(...))
+   - Re-factoring
+
 Revision 0.19 2013/10/30 syohex
    - Fix autoload cookie
    - Implement anzu-query-replace-at-cursor-thing
