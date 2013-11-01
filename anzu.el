@@ -361,40 +361,51 @@
         (anzu--query-validate-from-regexp from))
       from)))
 
-(defun anzu--calculate-replace-text (str use-regexp)
-  (let ((compiled (query-replace-compile-replacement str use-regexp)))
+(defun anzu--compile-replace-text (str)
+  (let ((compiled (query-replace-compile-replacement str t)))
     (cond ((stringp compiled) compiled)
           ((and (consp compiled) (functionp (car compiled)))
-           (funcall (car compiled) (cdr compiled) 0))
+           compiled)
           ((and (consp compiled) (stringp (car compiled)))
            (car compiled)))))
 
-(defun anzu--evaluate-occurrence (ov to-regexp)
+(defun anzu--evaluate-occurrence (ov to-regexp replace-count)
   (let ((from-regexp (overlay-get ov 'from-regexp))
-        (from-string (overlay-get ov 'from-string)))
+        (from-string (overlay-get ov 'from-string))
+        (compiled (anzu--compile-replace-text to-regexp)))
     (with-temp-buffer
       (insert from-string)
       (goto-char (point-min))
-      (if (re-search-forward from-regexp nil t)
-          (progn
-            (replace-match to-regexp)
-            (buffer-substring-no-properties (point-min) (point-max)))
-        to-regexp))))
+      (when (re-search-forward from-regexp nil t)
+        (if (consp compiled)
+            (replace-match (funcall (car compiled) (cdr compiled)
+                                    replace-count))
+          (replace-match compiled))
+        (buffer-substring (point-min) (point-max))))))
+
+(defun anzu--overlay-sort (a b)
+  (< (overlay-start a) (overlay-start b)))
+
+(defsubst anzu--overlays-in-range (beg end)
+  (loop for ov in (overlays-in beg end)
+        when (overlay-get ov 'anzu-replace)
+        collect ov into anzu-overlays
+        finally return (sort anzu-overlays 'anzu--overlay-sort)))
 
 (defun anzu--append-replaced-string (buf beg end use-regexp overlay-limit)
-  (let ((content (minibuffer-contents)))
+  (let ((content (minibuffer-contents))
+        (replace-count 0))
     (unless (string= content anzu--last-replace-input)
       (setq anzu--last-replace-input content)
       (with-current-buffer buf
-        (let ((overlay-end (min end overlay-limit))
-              (replace (anzu--calculate-replace-text content use-regexp)))
-          (dolist (ov (overlays-in beg overlay-end))
-            (when (overlay-get ov 'anzu-replace)
-              (let ((replace-evaled (if use-regexp
-                                        (anzu--evaluate-occurrence ov replace)
-                                      replace)))
-                (overlay-put ov 'after-string
-                             (propertize replace-evaled 'face 'anzu-replace-to))))))))))
+        (dolist (ov (anzu--overlays-in-range beg (min end overlay-limit)))
+          (let ((replace-evaled (and use-regexp (anzu--evaluate-occurrence
+                                                 ov content replace-count))))
+            (if replace-evaled
+                (incf replace-count)
+              (setq replace-evaled content))
+            (overlay-put ov 'after-string
+                         (propertize replace-evaled 'face 'anzu-replace-to))))))))
 
 (defun anzu--read-to-string (from prompt beg end use-regexp overlay-limit)
   (let ((curbuf (current-buffer))
