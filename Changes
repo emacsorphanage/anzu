@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.21 2013/11/05 syohex
+   - Fix different behavior from query-replace-regexp
+
 Revision 0.20 2013/11/01 syohex
    - Fix case of 0 width match such as '^', '$'
    - Improve replace commands(We can use \#, \1 in \,(...))
