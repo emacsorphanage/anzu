@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.22 2013/11/06 syohex
+   - Fix issue when using isearch-repeat-{forward,backward}
+
 Revision 0.21 2013/11/05 syohex
    - Fix different behavior from query-replace-regexp
 
