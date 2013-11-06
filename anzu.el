@@ -206,6 +206,7 @@
   (setq anzu--total-matched 0
         anzu--current-posion 0
         anzu--last-command nil
+        anzu--last-isearch-string nil
         anzu--overflow-p nil))
 
 (defun anzu--reset-mode-line ()
