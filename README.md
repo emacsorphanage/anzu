@@ -60,6 +60,9 @@ Add following S-exp in your configuration if you use anzu replace commands as de
 (global-set-key (kbd "C-M-%") 'anzu-query-replace-regexp)
 ```
 
+![anzu-replace-demo](image/anzu-replace-demo.git)
+
+
 #### `anzu-query-replace-at-cursor`
 
 Same as `anzu-query-replace` except *from-string* is symbol at cursor
