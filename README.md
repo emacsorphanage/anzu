@@ -163,6 +163,10 @@ It is hard to see with anzu replace command when region is active.
 Thing at point of `anzu-query-replace-at-cursor-thing`.
 This parameter is same as `thing-at-point`.
 
+#### `anzu-replace-to-string-separator`(Default is "")
+
+Separator of `to` string.
+
 
 ## Sample Configuration
 
@@ -173,5 +177,9 @@ This parameter is same as `thing-at-point`.
 (set-face-attribute 'anzu-mode-line nil
                     :foreground "yellow" :weight 'bold)
 
-(setq anzu-search-threshold 1000)
+(custom-set-variables
+ '(anzu-mode-lighter "")
+ '(anzu-deactivate-region t)
+ '(anzu-search-threshold 1000)
+ '(anzu-replace-to-string-separator " => "))
 ```

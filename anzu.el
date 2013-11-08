@@ -97,6 +97,11 @@
   :type 'symbol
   :group 'anzu)
 
+(defcustom anzu-replace-to-string-separator ""
+  "Separator of `to' string"
+  :type 'string
+  :group 'anzu)
+
 (defface anzu-mode-line
   '((t (:foreground "magenta" :weight bold)))
   "face of anzu modeline"
@@ -393,6 +398,10 @@
         collect ov into anzu-overlays
         finally return (sort anzu-overlays 'anzu--overlay-sort)))
 
+(defsubst anzu--propertize-to-string (str)
+  (let ((separator (or anzu-replace-to-string-separator "")))
+    (propertize (concat separator str) 'face 'anzu-replace-to)))
+
 (defun anzu--append-replaced-string (buf beg end use-regexp overlay-limit)
   (let ((content (minibuffer-contents))
         (replace-count 0))
@@ -405,8 +414,7 @@
             (if replace-evaled
                 (incf replace-count)
               (setq replace-evaled content))
-            (overlay-put ov 'after-string
-                         (propertize replace-evaled 'face 'anzu-replace-to))))))))
+            (overlay-put ov 'after-string (anzu--propertize-to-string replace-evaled))))))))
 
 (defun anzu--read-to-string (from prompt beg end use-regexp overlay-limit)
   (let ((curbuf (current-buffer))
