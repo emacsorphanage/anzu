@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.24 2013/11/20 syohex
+   - Fix invalid return type of 'anzu-replace-to-string-separator'
+
 Revision 0.23 2013/11/08 syohex
    - Add 'anzu-replace-to-string-separator' for separator of 'to' string
 
