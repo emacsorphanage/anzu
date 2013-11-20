@@ -463,7 +463,7 @@
       (setq anzu--total-matched
             (anzu--count-matched buf symbol-regexp beg end t overlay-limit))
       (force-mode-line-update)
-      symbol)))
+      symbol-regexp)))
 
 (defun anzu--thing-begin (thing)
   (let ((bound (bounds-of-thing-at-point thing)))
