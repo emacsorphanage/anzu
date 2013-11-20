@@ -29,7 +29,7 @@
 ;; for your search query.
 
 ;; To use this package, add following code to your init.el or .emacs
-;;   (require 'anzu)
+;;
 ;;   (global-anzu-mode +1)
 ;;
 
