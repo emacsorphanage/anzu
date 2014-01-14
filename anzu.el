@@ -473,12 +473,14 @@
   (let ((bound (bounds-of-thing-at-point thing)))
     (and bound (cdr bound))))
 
-(defun anzu--region-begin (use-region thing)
+(defun anzu--region-begin (use-region thing backward)
   (if thing
       (or (anzu--thing-begin thing) (point))
     (if use-region
         (region-beginning)
-      (point))))
+      (if backward
+          (point-min)
+        (point)))))
 
 (defun anzu--region-end (use-region thing)
   (if thing
@@ -492,14 +494,31 @@
         ((and at-cursor (not thing)) 'symbol)
         (t nil)))
 
-(defun anzu--query-replace-common (use-regexp &optional at-cursor thing)
+(defun anzu--replace-backward-p (prefix)
+  ;; This variable is introduced at Emacs 24.4, I should fix this variable to
+  ;; version variable
+  (and (boundp 'list-matching-lines-prefix-face)
+       (< prefix 0)))
+
+(defun anzu--construct-perform-replace-arguments (from to delimited beg end backward)
+  (if backward
+      (list from to t t delimited nil nil beg end backward)
+    (list from to t t delimited nil nil beg end)))
+
+(defun anzu--construct-query-replace-arguments (from to delimited beg end backward)
+  (if backward
+      (list from to delimited beg end backward)
+    (list from to delimited beg end)))
+
+(defun anzu--query-replace-common (use-regexp &optional at-cursor thing prefix-arg)
   (anzu--cons-mode-line 'replace)
   (let* ((use-region (use-region-p))
+         (backward (anzu--replace-backward-p prefix-arg))
          (overlay-limit (anzu--overlay-limit))
-         (beg (anzu--region-begin use-region (anzu--begin-thing at-cursor thing)))
+         (beg (anzu--region-begin use-region (anzu--begin-thing at-cursor thing) backward))
          (end (anzu--region-end use-region thing))
          (prompt (anzu--query-prompt use-region use-regexp))
-         (delimited current-prefix-arg)
+         (delimited (and current-prefix-arg (not (eq current-prefix-arg '-))))
          (curbuf (current-buffer))
          (clear-overlay nil))
     (when (and anzu-deactivate-region use-region)
@@ -517,8 +536,10 @@
           (anzu--clear-overlays curbuf beg end)
           (setq clear-overlay t)
           (if use-regexp
-              (perform-replace from to t t delimited nil nil beg end)
-            (query-replace from to delimited beg end)))
+              (apply 'perform-replace (anzu--construct-perform-replace-arguments
+                                       from to delimited beg end backward))
+            (apply 'query-replace (anzu--construct-query-replace-arguments
+                                   from to delimited beg end backward))))
       (progn
         (unless clear-overlay
           (anzu--clear-overlays curbuf beg end))
@@ -536,14 +557,14 @@
   (anzu--query-replace-common t t anzu-replace-at-cursor-thing))
 
 ;;;###autoload
-(defun anzu-query-replace ()
-  (interactive)
-  (anzu--query-replace-common nil))
+(defun anzu-query-replace (arg)
+  (interactive "p")
+  (anzu--query-replace-common nil nil nil arg))
 
 ;;;###autoload
-(defun anzu-query-replace-regexp ()
-  (interactive)
-  (anzu--query-replace-common t))
+(defun anzu-query-replace-regexp (arg)
+  (interactive "p")
+  (anzu--query-replace-common t nil nil arg))
 
 (provide 'anzu)
 ;;; anzu.el ends here
