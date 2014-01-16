@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.25 2014/01/16 syohex
+   - Support backward replacement for Emacs 24.4
+
 Revision 0.24 2013/11/20 syohex
    - Fix invalid return type of 'anzu-replace-to-string-separator'
 
