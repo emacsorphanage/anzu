@@ -194,9 +194,11 @@
               anzu--last-isearch-string isearch-string)
         (force-mode-line-update)))))
 
+(defconst anzu--mode-line-format '(:eval (anzu--update-mode-line)))
+
 (defsubst anzu--mode-line-not-set-p ()
   (and (listp mode-line-format)
-       (equal (car mode-line-format) '(:eval (anzu--update-mode-line)))))
+       (member anzu--mode-line-format mode-line-format)))
 
 (defun anzu--cons-mode-line-search ()
   (anzu--cons-mode-line 'search))
@@ -204,8 +206,7 @@
 (defun anzu--cons-mode-line (state)
   (setq anzu--state state)
   (when (and anzu-cons-mode-line-p (not (anzu--mode-line-not-set-p)))
-    (setq mode-line-format (cons '(:eval (anzu--update-mode-line))
-                                 mode-line-format))))
+    (setq mode-line-format (cons anzu--mode-line-format mode-line-format))))
 
 (defsubst anzu--reset-status ()
   (setq anzu--total-matched 0
@@ -217,7 +218,7 @@
 (defun anzu--reset-mode-line ()
   (anzu--reset-status)
   (when (and anzu-cons-mode-line-p (anzu--mode-line-not-set-p))
-    (setq mode-line-format (cdr mode-line-format))))
+    (setq mode-line-format (delete anzu--mode-line-format mode-line-format))))
 
 (defsubst anzu--format-here-position (here total)
   (if (and anzu--overflow-p (zerop here))
