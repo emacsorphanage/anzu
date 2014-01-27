@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.27 2014/01/27 syohex
+   - Fix non prefix issue
+
 Revision 0.26 2014/01/16 syohex
    - Fix #13 issue
      https://github.com/syohex/emacs-anzu/issues/13
