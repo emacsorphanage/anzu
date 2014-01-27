@@ -499,7 +499,7 @@
   ;; This variable is introduced at Emacs 24.4, I should fix this variable to
   ;; version variable
   (and (boundp 'list-matching-lines-prefix-face)
-       (< prefix 0)))
+       (and prefix (< prefix 0))))
 
 (defun anzu--construct-perform-replace-arguments (from to delimited beg end backward)
   (if backward
