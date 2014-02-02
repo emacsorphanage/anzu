@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.30 2014/02/02 syohex
+   - Fix wrong prompt issue
+
 Revision 0.29 2014/02/02 syohex
    - Add no query replace command
    - Use cl-lib instead of cl.el
