@@ -501,17 +501,17 @@
   (and (boundp 'list-matching-lines-prefix-face)
        (and prefix (< prefix 0))))
 
-(defun anzu--construct-perform-replace-arguments (from to delimited beg end backward)
+(defun anzu--construct-perform-replace-arguments (from to delimited beg end backward query)
   (if backward
-      (list from to t t delimited nil nil beg end backward)
-    (list from to t t delimited nil nil beg end)))
+      (list from to query t delimited nil nil beg end backward)
+    (list from to query t delimited nil nil beg end)))
 
 (defun anzu--construct-query-replace-arguments (from to delimited beg end backward)
   (if backward
       (list from to delimited beg end backward)
     (list from to delimited beg end)))
 
-(defun anzu--query-replace-common (use-regexp &optional at-cursor thing prefix-arg)
+(defun* anzu--query-replace-common (use-regexp &key at-cursor thing prefix-arg (query t))
   (anzu--cons-mode-line 'replace)
   (let* ((use-region (use-region-p))
          (backward (anzu--replace-backward-p prefix-arg))
@@ -538,7 +538,7 @@
           (setq clear-overlay t)
           (if use-regexp
               (apply 'perform-replace (anzu--construct-perform-replace-arguments
-                                       from to delimited beg end backward))
+                                       from to delimited beg end backward query))
             (apply 'query-replace (anzu--construct-query-replace-arguments
                                    from to delimited beg end backward))))
       (progn
@@ -550,22 +550,33 @@
 ;;;###autoload
 (defun anzu-query-replace-at-cursor ()
   (interactive)
-  (anzu--query-replace-common t t))
+  (anzu--query-replace-common t :at-cursor t))
 
 ;;;###autoload
 (defun anzu-query-replace-at-cursor-thing ()
   (interactive)
-  (anzu--query-replace-common t t anzu-replace-at-cursor-thing))
+  (anzu--query-replace-common t :at-cursor t :thing anzu-replace-at-cursor-thing))
 
 ;;;###autoload
 (defun anzu-query-replace (arg)
   (interactive "p")
-  (anzu--query-replace-common nil nil nil arg))
+  (anzu--query-replace-common nil :prefix-arg arg))
 
 ;;;###autoload
 (defun anzu-query-replace-regexp (arg)
   (interactive "p")
-  (anzu--query-replace-common t nil nil arg))
+  (anzu--query-replace-common t :prefix-arg arg))
+
+;;;###autoload
+(defun anzu-replace-at-cursor-thing ()
+  (interactive)
+  (let ((orig (point-marker)))
+    (anzu--query-replace-common t
+                                :at-cursor t
+                                :thing anzu-replace-at-cursor-thing
+                                :query nil)
+    (goto-char (marker-position orig))
+    (set-marker orig nil)))
 
 (provide 'anzu)
 ;;; anzu.el ends here
