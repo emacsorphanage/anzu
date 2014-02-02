@@ -5,6 +5,7 @@
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; URL: https://github.com/syohex/emacs-anzu
 ;; Version: 0.28
+;; Package-Requires: ((cl-lib "0.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -36,9 +37,9 @@
 ;;; Code:
 
 (eval-when-compile
-  (require 'cl)
   (defvar migemo-isearch-enable-p))
 
+(require 'cl-lib)
 (require 'thingatpt)
 
 (defgroup anzu nil
@@ -164,7 +165,7 @@
             (case-fold-search (anzu--case-fold-search str)))
         (while (and (not finish) (funcall search-func str nil t))
           (push (cons (match-beginning 0) (match-end 0)) positions)
-          (incf count)
+          (cl-incf count)
           (when (= (match-beginning 0) (match-end 0)) ;; Case of anchor such as "^"
             (if (eobp)
                 (setq finish t)
@@ -176,11 +177,11 @@
           result)))))
 
 (defun anzu--where-is-here (positions here)
-  (loop for (start . end) in positions
-        for i = 1 then (1+ i)
-        when (and (>= here start) (<= here end))
-        return i
-        finally return 0))
+  (cl-loop for (start . end) in positions
+           for i = 1 then (1+ i)
+           when (and (>= here start) (<= here end))
+           return i
+           finally return 0))
 
 (defun anzu--update ()
   (when (>= (length isearch-string) anzu-minimum-input-length)
@@ -226,7 +227,7 @@
     here))
 
 (defun anzu--update-mode-line-default (here total)
-  (case anzu--state
+  (cl-case anzu--state
     (search (propertize (format "(%s/%d%s)"
                                 (anzu--format-here-position here total)
                                 total (if anzu--overflow-p "+" ""))
@@ -300,7 +301,7 @@
                 (finish nil)
                 (case-fold-search (anzu--case-fold-search str)))
             (while (and (not finish) (re-search-forward str replace-end t))
-              (incf count)
+              (cl-incf count)
               (let ((beg (match-beginning 0))
                     (end (match-end 0)))
                 (when (= beg end)
@@ -394,10 +395,10 @@
   (< (overlay-start a) (overlay-start b)))
 
 (defsubst anzu--overlays-in-range (beg end)
-  (loop for ov in (overlays-in beg end)
-        when (overlay-get ov 'anzu-replace)
-        collect ov into anzu-overlays
-        finally return (sort anzu-overlays 'anzu--overlay-sort)))
+  (cl-loop for ov in (overlays-in beg end)
+           when (overlay-get ov 'anzu-replace)
+           collect ov into anzu-overlays
+           finally return (sort anzu-overlays 'anzu--overlay-sort)))
 
 (defsubst anzu--propertize-to-string (str)
   (let ((separator (or anzu-replace-to-string-separator "")))
@@ -413,7 +414,7 @@
           (let ((replace-evaled (and use-regexp (anzu--evaluate-occurrence
                                                  ov content replace-count))))
             (if replace-evaled
-                (incf replace-count)
+                (cl-incf replace-count)
               (setq replace-evaled content))
             (overlay-put ov 'after-string (anzu--propertize-to-string replace-evaled))))))))
 
@@ -511,7 +512,7 @@
       (list from to delimited beg end backward)
     (list from to delimited beg end)))
 
-(defun* anzu--query-replace-common (use-regexp &key at-cursor thing prefix-arg (query t))
+(cl-defun anzu--query-replace-common (use-regexp &key at-cursor thing prefix-arg (query t))
   (anzu--cons-mode-line 'replace)
   (let* ((use-region (use-region-p))
          (backward (anzu--replace-backward-p prefix-arg))

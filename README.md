@@ -15,6 +15,7 @@ information in the mode-line in various search mode.
 ## Requirements
 
 * Emacs 24 or higher
+* cl-lib 0.3 or higher
 
 
 ## Installation
