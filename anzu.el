@@ -272,9 +272,9 @@
           (if use-regexp " regexp" "")
           (if use-region " in region" ""))  )
 
-(defun anzu--query-prompt (use-region use-regexp)
+(defun anzu--query-prompt (use-region use-regexp at-cursor)
   (let ((prompt (anzu--query-prompt-base use-region use-regexp)))
-    (if query-replace-defaults
+    (if (and query-replace-defaults (not at-cursor))
         (format "%s (default %s -> %s) " prompt
                 (query-replace-descr (car query-replace-defaults))
                 (query-replace-descr (cdr query-replace-defaults)))
@@ -519,7 +519,7 @@
          (overlay-limit (anzu--overlay-limit))
          (beg (anzu--region-begin use-region (anzu--begin-thing at-cursor thing) backward))
          (end (anzu--region-end use-region thing))
-         (prompt (anzu--query-prompt use-region use-regexp))
+         (prompt (anzu--query-prompt use-region use-regexp at-cursor))
          (delimited (and current-prefix-arg (not (eq current-prefix-arg '-))))
          (curbuf (current-buffer))
          (clear-overlay nil))
