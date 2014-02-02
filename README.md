@@ -15,7 +15,7 @@ information in the mode-line in various search mode.
 ## Requirements
 
 * Emacs 24 or higher
-* cl-lib 0.3 or higher
+* `cl-lib` 0.3 or higher(You need not to install `cl-lib` if you use Emacs 24.3 or higher)
 
 
 ## Installation
@@ -72,6 +72,12 @@ Same as `anzu-query-replace` except *from-string* is symbol at cursor
 
 Same as `anzu-query-replace-at-cursor` except replaced region is
 specified by `anzu-replace-at-cursor-thing`.
+
+#### `anzu-replace-at-cursor-thing`
+
+Same as `anzu-query-replace-at-cursor-thing` except not query.
+This command is usuful refactoring such as changing variable name
+in the function.
 
 
 ## Customization
