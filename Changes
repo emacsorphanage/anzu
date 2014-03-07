@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.31 2014/03/07 syohex
+   - Enable lexical-binding
+   - Update requirement cl-lib.el version
+
 Revision 0.30 2014/02/02 syohex
    - Fix wrong prompt issue
 
