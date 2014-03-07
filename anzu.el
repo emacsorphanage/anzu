@@ -1,4 +1,4 @@
-;;; anzu.el --- Show number of matches in mode-line while searching
+;;; anzu.el --- Show number of matches in mode-line while searching -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014 by Syohei YOSHIDA
 
@@ -132,7 +132,7 @@
 (defvar anzu--last-replace-input "")
 
 (defun anzu--validate-regexp (regexp)
-  (condition-case err
+  (condition-case nil
       (progn
         (string-match-p regexp "")
         t)
@@ -377,7 +377,7 @@
           ((and (consp compiled) (stringp (car compiled)))
            (car compiled)))))
 
-(defun anzu--evaluate-occurrence (ov to-regexp replace-count)
+(defun anzu--evaluate-occurrence (ov to-regexp replacements)
   (let ((from-regexp (overlay-get ov 'from-regexp))
         (from-string (overlay-get ov 'from-string))
         (compiled (anzu--compile-replace-text to-regexp)))
@@ -387,7 +387,7 @@
       (when (re-search-forward from-regexp nil t)
         (if (consp compiled)
             (replace-match (funcall (car compiled) (cdr compiled)
-                                    replace-count) t)
+                                    replacements) t)
           (replace-match compiled t))
         (buffer-substring (point-min) (point-max))))))
 
@@ -406,15 +406,15 @@
 
 (defun anzu--append-replaced-string (buf beg end use-regexp overlay-limit)
   (let ((content (minibuffer-contents))
-        (replace-count 0))
+        (replacements 0))
     (unless (string= content anzu--last-replace-input)
       (setq anzu--last-replace-input content)
       (with-current-buffer buf
         (dolist (ov (anzu--overlays-in-range beg (min end overlay-limit)))
           (let ((replace-evaled (and use-regexp (anzu--evaluate-occurrence
-                                                 ov content replace-count))))
+                                                 ov content replacements))))
             (if replace-evaled
-                (cl-incf replace-count)
+                (cl-incf replacements)
               (setq replace-evaled content))
             (overlay-put ov 'after-string (anzu--propertize-to-string replace-evaled))))))))
 
@@ -457,7 +457,7 @@
     (forward-line 1)
     (point)))
 
-(defun anzu--query-from-at-cursor (prompt buf beg end overlay-limit)
+(defun anzu--query-from-at-cursor (buf beg end overlay-limit)
   (let ((symbol (thing-at-point 'symbol)))
     (unless symbol
       (error "No symbol at cursor!!"))
@@ -529,7 +529,7 @@
         (let* ((from (if (and at-cursor beg)
                          (progn
                            (setq delimited nil)
-                           (anzu--query-from-at-cursor prompt curbuf beg end overlay-limit))
+                           (anzu--query-from-at-cursor curbuf beg end overlay-limit))
                        (anzu--query-from-string prompt beg end use-regexp overlay-limit)))
                (to (if (consp from)
                        (prog1 (cdr from) (setq from (car from)))
