@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.32 2014/03/08 syohex
+   - Specify Emacs version
+
 Revision 0.31 2014/03/07 syohex
    - Enable lexical-binding
    - Update requirement cl-lib.el version
