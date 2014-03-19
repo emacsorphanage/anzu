@@ -258,12 +258,12 @@
     (remove-hook 'isearch-mode-end-hook 'anzu--reset-mode-line t)
     (anzu--reset-mode-line)))
 
+(defun anzu--turn-on ()
+  (unless (minibufferp)
+    (anzu-mode +1)))
+
 ;;;###autoload
-(define-global-minor-mode global-anzu-mode
-  anzu-mode
-  (lambda ()
-    (unless (minibufferp)
-      (anzu-mode t)))
+(define-global-minor-mode global-anzu-mode anzu-mode anzu--turn-on
   :group 'anzu)
 
 (defsubst anzu--query-prompt-base (use-region use-regexp)
