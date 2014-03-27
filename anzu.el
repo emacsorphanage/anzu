@@ -385,11 +385,13 @@
       (insert from-string)
       (goto-char (point-min))
       (when (re-search-forward from-regexp nil t)
-        (if (consp compiled)
-            (replace-match (funcall (car compiled) (cdr compiled)
-                                    replacements) t)
-          (replace-match compiled t))
-        (buffer-substring (point-min) (point-max))))))
+        (or (ignore-errors
+              (if (consp compiled)
+                  (replace-match (funcall (car compiled) (cdr compiled)
+                                          replacements) t)
+                (replace-match compiled t))
+              (buffer-substring (point-min) (point-max)))
+            "")))))
 
 (defun anzu--overlay-sort (a b)
   (< (overlay-start a) (overlay-start b)))
