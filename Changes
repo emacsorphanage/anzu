@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.34 2014/03/28 syohex
+   - Fix replacement issue
+     Reported by purcell.
+
 Revision 0.33 2014/03/19 syohex
    - Fix byte compile warnings for Emacs 24.3
 
