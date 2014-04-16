@@ -61,7 +61,7 @@ Add following S-exp in your configuration if you use anzu replace commands as de
 (global-set-key (kbd "C-M-%") 'anzu-query-replace-regexp)
 ```
 
-![anzu-replace-demo](image/anzu-replace-demo.gif)
+[anzu-replace-demo](image/anzu-replace-demo.gif)
 
 
 #### `anzu-query-replace-at-cursor`
@@ -78,6 +78,8 @@ specified by `anzu-replace-at-cursor-thing`.
 Same as `anzu-query-replace-at-cursor-thing` except not query.
 This command is usuful refactoring such as changing variable name
 in the function.
+
+![anzu-replace-demo](image/anzu-replace-demo-noquery.gif)
 
 
 ## Customization
