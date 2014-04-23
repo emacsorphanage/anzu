@@ -263,7 +263,7 @@
     (anzu-mode +1)))
 
 ;;;###autoload
-(define-global-minor-mode global-anzu-mode anzu-mode anzu--turn-on
+(define-globalized-minor-mode global-anzu-mode anzu-mode anzu--turn-on
   :group 'anzu)
 
 (defsubst anzu--query-prompt-base (use-region use-regexp)
