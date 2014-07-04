@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.36 2014/07/04 syohex
+   - Implement replacement only specified lines
+
 Revision 0.35 2014/04/23 syohex
    - Change function name for maintenance
 
