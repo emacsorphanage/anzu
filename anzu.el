@@ -478,20 +478,23 @@
     (and bound (cdr bound))))
 
 (defun anzu--region-begin (use-region thing backward)
-  (if thing
-      (or (anzu--thing-begin thing) (point))
-    (if use-region
-        (region-beginning)
-      (if backward
-          (point-min)
-        (point)))))
+  (cond (current-prefix-arg (line-beginning-position))
+        (thing (or (anzu--thing-begin thing) (point)))
+        (use-region (region-beginning))
+        (backward (point-min))
+        (t (point))))
+
+(defsubst anzu--line-end-position (num)
+  (save-excursion
+    (forward-line (1- num))
+    (line-end-position)))
 
 (defun anzu--region-end (use-region thing)
-  (if thing
-      (or (anzu--thing-end thing) (point-max))
-    (if use-region
-        (region-end)
-      (point-max))))
+  (cond (current-prefix-arg
+         (anzu--line-end-position (prefix-numeric-value current-prefix-arg)))
+        (thing (or (anzu--thing-end thing) (point-max)))
+        (use-region (region-end))
+        (t (point-max))))
 
 (defun anzu--begin-thing (at-cursor thing)
   (cond ((and at-cursor thing) thing)
