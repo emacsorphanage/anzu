@@ -1,7 +1,7 @@
 (source gnu)
 (source melpa)
 
-(package "anzu" "0.36" "Search like Chrome")
+(package-file "anzu.el")
 
 (development
  (depends-on "powerline")
