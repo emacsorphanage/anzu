@@ -105,7 +105,7 @@ you propertize string by yourself.
 (defun my/anzu-update-func (here total)
   (propertize (format "<%d/%d>" here total)
               'face '((:foreground "yellow" :weight bold))))
-(setq anzu-mode-line-update-function 'my/update-func)
+(setq anzu-mode-line-update-function my/anzu-update-func)
 ```
 
 #### `anzu-cons-mode-line-p`(Default is `t`)
