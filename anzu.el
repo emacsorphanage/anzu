@@ -130,6 +130,7 @@
 (defvar anzu--state nil)
 (defvar anzu--cached-count 0)
 (defvar anzu--last-replace-input "")
+(defvar anzu--last-search-state nil)
 
 (defun anzu--validate-regexp (regexp)
   (condition-case nil
@@ -145,36 +146,45 @@
   (let ((case-fold-search nil))
     (not (string-match-p "[A-Z]" input))))
 
+(defsubst anzu--word-search-p ()
+  (and (not (memq anzu--last-command anzu-regexp-search-commands))
+       (not isearch-regexp)))
+
+(defun anzu--transform-input (str)
+  (cond ((eq isearch-word 'isearch-symbol-regexp)
+         (setq str (concat "\\_<" str "\\_>")))
+        ((anzu--word-search-p)
+         (setq str (regexp-quote str)))
+        (t str)))
+
 (defun anzu--search-all-position (str)
   (unless anzu--last-command
     (setq anzu--last-command last-command))
-  (when (and (not (memq anzu--last-command anzu-regexp-search-commands))
-             (not isearch-regexp))
-    (setq str (regexp-quote str)))
-  (if (not (anzu--validate-regexp str))
-      anzu--cached-positions
-    (save-excursion
-      (goto-char (point-min))
-      (let ((positions '())
-            (count 0)
-            (overflow nil)
-            (finish nil)
-            (search-func (if (and anzu-use-migemo migemo-isearch-enable-p)
-                             'migemo-forward
-                           're-search-forward))
-            (case-fold-search (anzu--case-fold-search str)))
-        (while (and (not finish) (funcall search-func str nil t))
-          (push (cons (match-beginning 0) (match-end 0)) positions)
-          (cl-incf count)
-          (when (= (match-beginning 0) (match-end 0)) ;; Case of anchor such as "^"
-            (if (eobp)
-                (setq finish t)
-              (forward-char 1)))
-          (when (and anzu-search-threshold (>= count anzu-search-threshold))
-            (setq overflow t finish t)))
-        (let ((result (anzu--construct-position-info count overflow (reverse positions))))
-          (setq anzu--cached-positions (copy-sequence result))
-          result)))))
+  (let ((input (anzu--transform-input str)))
+    (if (not (anzu--validate-regexp input))
+        anzu--cached-positions
+      (save-excursion
+        (goto-char (point-min))
+        (let ((positions '())
+              (count 0)
+              (overflow nil)
+              (finish nil)
+              (search-func (if (and anzu-use-migemo migemo-isearch-enable-p)
+                               'migemo-forward
+                             're-search-forward))
+              (case-fold-search (anzu--case-fold-search input)))
+          (while (and (not finish) (funcall search-func input nil t))
+            (push (cons (match-beginning 0) (match-end 0)) positions)
+            (cl-incf count)
+            (when (= (match-beginning 0) (match-end 0)) ;; Case of anchor such as "^"
+              (if (eobp)
+                  (setq finish t)
+                (forward-char 1)))
+            (when (and anzu-search-threshold (>= count anzu-search-threshold))
+              (setq overflow t finish t)))
+          (let ((result (anzu--construct-position-info count overflow (reverse positions))))
+            (setq anzu--cached-positions (copy-sequence result))
+            result))))))
 
 (defun anzu--where-is-here (positions here)
   (cl-loop for (start . end) in positions
@@ -183,15 +193,21 @@
            return i
            finally return 0))
 
+(defun anzu--use-result-cache-p (input)
+  (and (eq isearch-word (car anzu--last-search-state))
+       (eq isearch-regexp (cdr anzu--last-search-state))
+       (string= input anzu--last-isearch-string)))
+
 (defun anzu--update ()
   (when (>= (length isearch-string) anzu-minimum-input-length)
-    (let ((result (if (string= isearch-string anzu--last-isearch-string)
+    (let ((result (if (anzu--use-result-cache-p isearch-string)
                       anzu--cached-positions
                     (anzu--search-all-position isearch-string))))
       (let ((curpos (anzu--where-is-here (plist-get result :positions) (point))))
         (setq anzu--total-matched (plist-get result :count)
               anzu--overflow-p (plist-get result :overflow)
               anzu--current-posion curpos
+              anzu--last-search-state (cons isearch-word isearch-regexp)
               anzu--last-isearch-string isearch-string)
         (force-mode-line-update)))))
 
