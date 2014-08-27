@@ -228,6 +228,7 @@
 (defsubst anzu--reset-status ()
   (setq anzu--total-matched 0
         anzu--current-posion 0
+        anzu--state nil
         anzu--last-command nil
         anzu--last-isearch-string nil
         anzu--overflow-p nil))
@@ -243,14 +244,14 @@
     here))
 
 (defun anzu--update-mode-line-default (here total)
-  (cl-case anzu--state
-    (search (propertize (format "(%s/%d%s)"
-                                (anzu--format-here-position here total)
-                                total (if anzu--overflow-p "+" ""))
-                        'face 'anzu-mode-line))
-    (replace (propertize (format "(%d replace)" total)
-                         'face 'anzu-mode-line))
-    (otherwise "")))
+  (when anzu--state
+    (let ((status (cl-case anzu--state
+                    (search (format "(%s/%d%s)"
+                                    (anzu--format-here-position here total)
+                                    total (if anzu--overflow-p "+" "")))
+                    (replace-query (format "(%d replace)" total))
+                    (replace (format "(%d/%d)" here total)))))
+      (propertize status 'face 'anzu-mode-line))))
 
 (defun anzu--update-mode-line ()
   (let ((update-func (or anzu-mode-line-update-function
@@ -533,8 +534,13 @@
       (list from to delimited beg end backward)
     (list from to delimited beg end)))
 
+(defadvice replace-match-maybe-edit (before anzu-replace-match activate)
+  (when (eq anzu--state 'replace)
+    (force-mode-line-update)
+    (cl-incf anzu--current-posion)))
+
 (cl-defun anzu--query-replace-common (use-regexp &key at-cursor thing prefix-arg (query t))
-  (anzu--cons-mode-line 'replace)
+  (anzu--cons-mode-line 'replace-query)
   (let* ((use-region (use-region-p))
          (backward (anzu--replace-backward-p prefix-arg))
          (overlay-limit (anzu--overlay-limit))
@@ -557,7 +563,8 @@
                      (anzu--query-replace-read-to
                       from prompt beg end use-regexp overlay-limit))))
           (anzu--clear-overlays curbuf beg end)
-          (setq clear-overlay t)
+          (setq anzu--state 'replace anzu--current-posion 1
+                clear-overlay t)
           (if use-regexp
               (apply 'perform-replace (anzu--construct-perform-replace-arguments
                                        from to delimited beg end backward query))
