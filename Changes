@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.37 2014/08/27 syohex
+   - Fix for isearch toggle commands and symbol search
+   - Improve mode line in replacing commands
+
 Revision 0.36 2014/07/04 syohex
    - Implement replacement only specified lines
 
