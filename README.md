@@ -4,7 +4,7 @@
 
 `anzu.el` is an Emacs port of [anzu.vim](https://github.com/osyo-manga/vim-anzu).
 `anzu.el` provides a minor mode which displays *current match* and *total matches*
-information in the mode-line in various search mode.
+information in the mode-line in various search modes.
 
 
 ## Screenshot
@@ -15,7 +15,7 @@ information in the mode-line in various search mode.
 ## Requirements
 
 * Emacs 24 or higher
-* `cl-lib` 0.3 or higher(You need not to install `cl-lib` if you use Emacs 24.3 or higher)
+* `cl-lib` 0.3 or higher (you don't need to install `cl-lib` if you use Emacs 24.3 or higher)
 
 
 ## Installation
@@ -54,7 +54,7 @@ Same as `query-replace` except anzu information in mode-line
 Same as `query-replace-regexp` except anzu information in mode-line
 
 
-Add following S-exp in your configuration if you use anzu replace commands as default.
+Add following S-exp in your configuration if you want to use anzu's replace commands by default.
 
 ```lisp
 (global-set-key (kbd "M-%") 'anzu-query-replace)
@@ -76,7 +76,7 @@ specified by `anzu-replace-at-cursor-thing`.
 #### `anzu-replace-at-cursor-thing`
 
 Same as `anzu-query-replace-at-cursor-thing` except not query.
-This command is usuful refactoring such as changing variable name
+This command is useful in refactoring such as changing variable name
 in the function.
 
 ![anzu-replace-demo](image/anzu-replace-demo-noquery.gif)
