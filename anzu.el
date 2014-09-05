@@ -579,6 +579,7 @@
 (cl-defun anzu--query-replace-common (use-regexp &key at-cursor thing prefix-arg (query t))
   (anzu--cons-mode-line 'replace-query)
   (let* ((use-region (use-region-p))
+         (orig-point (point))
          (backward (anzu--replace-backward-p prefix-arg))
          (overlay-limit (anzu--overlay-limit))
          (beg (anzu--region-begin use-region (anzu--begin-thing at-cursor thing) backward))
@@ -610,6 +611,8 @@
       (progn
         (unless clear-overlay
           (anzu--clear-overlays curbuf beg end))
+        (when (zerop anzu--current-posion)
+          (goto-char orig-point))
         (anzu--reset-mode-line)
         (force-mode-line-update)))))
 
