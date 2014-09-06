@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.38 2014/09/06 syohex
+   - Improve replace command suggested by DamienCassou
+
 Revision 0.37 2014/08/27 syohex
    - Fix for isearch toggle commands and symbol search
    - Improve mode line in replacing commands
