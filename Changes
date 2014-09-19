@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.39 2014/09/19 syohex
+   - Fix bug case when bounds-of-thing-at-point returns nil
+
 Revision 0.38 2014/09/06 syohex
    - Improve replace command suggested by DamienCassou
 
