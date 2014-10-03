@@ -122,7 +122,7 @@
   :group 'anzu)
 
 (defvar anzu--total-matched 0)
-(defvar anzu--current-posion 0)
+(defvar anzu--current-position 0)
 (defvar anzu--overflow-p nil)
 (defvar anzu--last-isearch-string nil)
 (defvar anzu--cached-positions nil)
@@ -208,7 +208,7 @@
       (let ((curpos (anzu--where-is-here (plist-get result :positions) (point))))
         (setq anzu--total-matched (plist-get result :count)
               anzu--overflow-p (plist-get result :overflow)
-              anzu--current-posion curpos
+              anzu--current-position curpos
               anzu--last-search-state (cons isearch-word isearch-regexp)
               anzu--last-isearch-string isearch-string)
         (force-mode-line-update)))))
@@ -229,7 +229,7 @@
 
 (defsubst anzu--reset-status ()
   (setq anzu--total-matched 0
-        anzu--current-posion 0
+        anzu--current-position 0
         anzu--state nil
         anzu--last-command nil
         anzu--last-isearch-string nil
@@ -258,7 +258,7 @@
 (defun anzu--update-mode-line ()
   (let ((update-func (or anzu-mode-line-update-function
                          'anzu--update-mode-line-default)))
-    (funcall update-func anzu--current-posion anzu--total-matched)))
+    (funcall update-func anzu--current-position anzu--total-matched)))
 
 ;;;###autoload
 (define-minor-mode anzu-mode
@@ -299,6 +299,12 @@
                 (query-replace-descr (cdr query-replace-defaults)))
       prompt)))
 
+(defvar anzu--replaced-markers nil)
+(defsubst anzu--set-marker (beg buf)
+  (let ((m (make-marker)))
+    (set-marker m beg buf)
+    (push m anzu--replaced-markers)))
+
 (defun anzu--add-overlay (regexp beg end)
   (let ((ov (make-overlay beg end)))
     (overlay-put ov 'from-regexp regexp)
@@ -306,9 +312,14 @@
     (overlay-put ov 'face 'anzu-replace-highlight)
     (overlay-put ov 'anzu-replace t)))
 
+(defsubst anzu--cleanup-markers ()
+  (mapc (lambda (m) (set-marker m nil)) anzu--replaced-markers)
+  (setq anzu--replaced-markers nil))
+
 ;; Return highlighted count
 (defun anzu--count-and-highlight-matched (buf str replace-beg replace-end
                                           use-regexp overlay-limit)
+  (anzu--cleanup-markers)
   (when (not use-regexp)
     (setq str (regexp-quote str)))
   (if (not (anzu--validate-regexp str))
@@ -332,6 +343,7 @@
                     (forward-char 1)))
                 (when (and (>= beg overlay-beg) (<= end overlay-end) (not finish))
                   (cl-incf overlayed)
+                  (anzu--set-marker beg buf)
                   (anzu--add-overlay str beg end))))
             (setq anzu--cached-count count)
             overlayed))))))
@@ -582,10 +594,19 @@
       (list from to delimited beg end backward)
     (list from to delimited beg end)))
 
-(defadvice replace-match-maybe-edit (before anzu-replace-match activate)
-  (when (eq anzu--state 'replace)
-    (force-mode-line-update)
-    (cl-incf anzu--current-posion)))
+(defsubst anzu--current-replaced-index (curpoint)
+  (cl-loop for m in anzu--replaced-markers
+           for i = 1 then (+ i 1)
+           for pos = (marker-position m)
+           when (= pos curpoint)
+           return i))
+
+(defadvice replace-highlight (before anzu-replace-highlight activate)
+  (when (and (eq anzu--state 'replace) anzu--replaced-markers)
+    (let ((index (anzu--current-replaced-index (ad-get-arg 0))))
+      (when (or (not index) (/= index anzu--current-position))
+        (force-mode-line-update)
+        (setq anzu--current-position (or index 1))))))
 
 (cl-defun anzu--query-replace-common (use-regexp &key at-cursor thing prefix-arg (query t))
   (anzu--cons-mode-line 'replace-query)
@@ -614,7 +635,8 @@
                      (anzu--query-replace-read-to
                       from prompt beg end use-regexp overlay-limit))))
           (anzu--clear-overlays curbuf beg end)
-          (setq anzu--state 'replace anzu--current-posion 1
+          (setq anzu--state 'replace anzu--current-position 0
+                anzu--replaced-markers (reverse anzu--replaced-markers)
                 clear-overlay t)
           (if use-regexp
               (apply 'perform-replace (anzu--construct-perform-replace-arguments
@@ -624,7 +646,7 @@
       (progn
         (unless clear-overlay
           (anzu--clear-overlays curbuf beg end))
-        (when (zerop anzu--current-posion)
+        (when (zerop anzu--current-position)
           (goto-char orig-point))
         (anzu--reset-mode-line)
         (force-mode-line-update)))))
