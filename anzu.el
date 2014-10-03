@@ -131,6 +131,7 @@
 (defvar anzu--cached-count 0)
 (defvar anzu--last-replace-input "")
 (defvar anzu--last-search-state nil)
+(defvar anzu--last-replaced-count nil)
 (defvar anzu--outside-point nil)
 
 (defun anzu--validate-regexp (regexp)
@@ -401,8 +402,11 @@
       (sit-for 2))))
 
 (defun anzu--query-from-string (prompt beg end use-regexp overlay-limit)
-  (let ((from (anzu--read-from-string prompt beg end use-regexp overlay-limit)))
-    (if (and (string= from "") query-replace-defaults)
+  (let* ((from (anzu--read-from-string prompt beg end use-regexp overlay-limit))
+         (is-empty (string= from "")))
+    (when (and (not is-empty) (not query-replace-defaults))
+      (setq anzu--last-replaced-count anzu--total-matched))
+    (if (and is-empty query-replace-defaults)
         (cons (car query-replace-defaults)
               (query-replace-compile-replacement
                (cdr query-replace-defaults) use-regexp))
@@ -604,7 +608,9 @@
                            (anzu--query-from-at-cursor curbuf beg end overlay-limit))
                        (anzu--query-from-string prompt beg end use-regexp overlay-limit)))
                (to (if (consp from)
-                       (prog1 (cdr from) (setq from (car from)))
+                       (prog1 (cdr from)
+                         (setq from (car from)
+                               anzu--total-matched anzu--last-replaced-count))
                      (anzu--query-replace-read-to
                       from prompt beg end use-regexp overlay-limit))))
           (anzu--clear-overlays curbuf beg end)
