@@ -36,9 +36,6 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (defvar migemo-isearch-enable-p))
-
 (require 'cl-lib)
 (require 'thingatpt)
 
@@ -163,7 +160,8 @@
   (when anzu-use-migemo
     (unless (featurep 'migemo)
       (error "Error: migemo is not loaded"))
-    migemo-isearch-enable-p))
+    (and (boundp 'migemo-isearch-enable-p)
+         (symbol-value 'migemo-isearch-enable-p))))
 
 (defun anzu--search-all-position (str)
   (unless anzu--last-command
