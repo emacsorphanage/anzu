@@ -159,6 +159,12 @@
          (setq str (regexp-quote str)))
         (t str)))
 
+(defsubst anzu--use-migemo-p ()
+  (when anzu-use-migemo
+    (unless (featurep 'migemo)
+      (error "Error: migemo is not loaded"))
+    migemo-isearch-enable-p))
+
 (defun anzu--search-all-position (str)
   (unless anzu--last-command
     (setq anzu--last-command last-command))
@@ -171,7 +177,7 @@
               (count 0)
               (overflow nil)
               (finish nil)
-              (search-func (if (and anzu-use-migemo migemo-isearch-enable-p)
+              (search-func (if (anzu--use-migemo-p)
                                'migemo-forward
                              're-search-forward))
               (case-fold-search (anzu--case-fold-search input)))
