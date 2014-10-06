@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.41 2014/10/06 syohex
+   - Improve checking whether using migemo
+
 Revision 0.40 2014/10/03 syohex
    - Fix replace command bug when using '^' or 'no' command
 
