@@ -1,4 +1,4 @@
-# anzu.el
+# anzu.el [![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
 
 ## Introduction
 
@@ -192,3 +192,8 @@ Separator of `to` string.
  '(anzu-search-threshold 1000)
  '(anzu-replace-to-string-separator " => "))
 ```
+
+[melpa-link]: http://melpa.milkbox.net/#/anzu
+[melpa-stable-link]: http://melpa-stable.milkbox.net/#/anzu
+[melpa-badge]: http://melpa.milkbox.net/packages/anzu-badge.svg
+[melpa-stable-badge]: http://melpa-stable.milkbox.net/packages/anzu-badge.svg
