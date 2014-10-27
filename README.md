@@ -20,7 +20,7 @@ information in the mode-line in various search modes.
 
 ## Installation
 
-You can install `anzu.el` from [MELPA](http://melpa.milkbox.net/) with `package.el`
+You can install `anzu.el` from [MELPA](http://melpa.org/) with `package.el`
 
 ```
  M-x package-install anzu
@@ -193,7 +193,7 @@ Separator of `to` string.
  '(anzu-replace-to-string-separator " => "))
 ```
 
-[melpa-link]: http://melpa.milkbox.net/#/anzu
-[melpa-stable-link]: http://melpa-stable.milkbox.net/#/anzu
-[melpa-badge]: http://melpa.milkbox.net/packages/anzu-badge.svg
-[melpa-stable-badge]: http://melpa-stable.milkbox.net/packages/anzu-badge.svg
+[melpa-link]: http://melpa.org/#/anzu
+[melpa-stable-link]: http://stable.melpa.org/#/anzu
+[melpa-badge]: http://melpa.org/packages/anzu-badge.svg
+[melpa-stable-badge]: http://stable.melpa.org/packages/anzu-badge.svg
