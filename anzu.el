@@ -322,7 +322,7 @@
 
 ;; Return highlighted count
 (defun anzu--count-and-highlight-matched (buf str replace-beg replace-end
-                                          use-regexp overlay-limit)
+                                          use-regexp overlay-limit case-sensitive)
   (anzu--cleanup-markers)
   (when (not use-regexp)
     (setq str (regexp-quote str)))
@@ -336,7 +336,9 @@
           (let ((count 0)
                 (overlayed 0)
                 (finish nil)
-                (case-fold-search (anzu--case-fold-search str)))
+                (case-fold-search (if case-sensitive
+                                      nil
+                                    (anzu--case-fold-search str))))
             (while (and (not finish) (re-search-forward str replace-end t))
               (cl-incf count)
               (let ((beg (match-beginning 0))
@@ -359,14 +361,16 @@
       (when (funcall searchfn input end t)
         (setq anzu--outside-point (match-beginning 0))
         (let ((overlay-limit (anzu--overlay-limit)))
-          (anzu--count-and-highlight-matched buf input beg end use-regexp overlay-limit))))))
+          (anzu--count-and-highlight-matched buf input beg end use-regexp
+                                             overlay-limit nil))))))
 
 (defun anzu--check-minibuffer-input (buf beg end use-regexp overlay-limit)
   (let* ((content (minibuffer-contents))
          (empty-p (string= content ""))
          (overlayed (if empty-p
                         (setq anzu--cached-count 0)
-                      (anzu--count-and-highlight-matched buf content beg end use-regexp overlay-limit))))
+                      (anzu--count-and-highlight-matched buf content beg end use-regexp
+                                                         overlay-limit nil))))
     (when anzu--outside-point
       (setq anzu--outside-point nil)
       (with-selected-window (get-buffer-window buf)
@@ -538,7 +542,7 @@
     (unless symbol
       (error "No symbol at cursor!!"))
     (let ((symbol-regexp (concat "\\_<" (regexp-quote symbol) "\\_>")))
-      (anzu--count-and-highlight-matched buf symbol-regexp beg end t overlay-limit)
+      (anzu--count-and-highlight-matched buf symbol-regexp beg end t overlay-limit t)
       (setq anzu--total-matched anzu--cached-count)
       (force-mode-line-update)
       symbol-regexp)))
@@ -642,11 +646,12 @@
           (setq anzu--state 'replace anzu--current-position 0
                 anzu--replaced-markers (reverse anzu--replaced-markers)
                 clear-overlay t)
-          (if use-regexp
-              (apply 'perform-replace (anzu--construct-perform-replace-arguments
-                                       from to delimited beg end backward query))
-            (apply 'query-replace (anzu--construct-query-replace-arguments
-                                   from to delimited beg end backward))))
+          (let ((case-fold-search (not at-cursor)))
+            (if use-regexp
+                (apply 'perform-replace (anzu--construct-perform-replace-arguments
+                                         from to delimited beg end backward query))
+              (apply 'query-replace (anzu--construct-query-replace-arguments
+                                     from to delimited beg end backward)))))
       (progn
         (unless clear-overlay
           (anzu--clear-overlays curbuf beg end))
