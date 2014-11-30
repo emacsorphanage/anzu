@@ -160,8 +160,7 @@
   (when anzu-use-migemo
     (unless (featurep 'migemo)
       (error "Error: migemo is not loaded"))
-    (and (boundp 'migemo-isearch-enable-p)
-         (symbol-value 'migemo-isearch-enable-p))))
+    (bound-and-true-p migemo-isearch-enable-p)))
 
 (defun anzu--search-all-position (str)
   (unless anzu--last-command
