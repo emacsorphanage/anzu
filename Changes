@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.43 2014/11/30 syohex
+   - Re-factoring for using migemo variable(Thanks lunaryorn)
+
 Revision 0.42 2014/11/28 syohex
    - Replacement by case sensitive for at-cursor commands
 
