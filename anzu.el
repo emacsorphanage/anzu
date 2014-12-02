@@ -355,13 +355,14 @@
 
 (defun anzu--search-outside-visible (buf input beg end use-regexp)
   (let ((searchfn (if use-regexp 're-search-forward 'search-forward)))
-    (with-selected-window (get-buffer-window buf)
-      (goto-char beg)
-      (when (funcall searchfn input end t)
-        (setq anzu--outside-point (match-beginning 0))
-        (let ((overlay-limit (anzu--overlay-limit)))
-          (anzu--count-and-highlight-matched buf input beg end use-regexp
-                                             overlay-limit nil))))))
+    (when (or (not use-regexp) (anzu--validate-regexp input))
+      (with-selected-window (get-buffer-window buf)
+        (goto-char beg)
+        (when (funcall searchfn input end t)
+          (setq anzu--outside-point (match-beginning 0))
+          (let ((overlay-limit (anzu--overlay-limit)))
+            (anzu--count-and-highlight-matched buf input beg end use-regexp
+                                               overlay-limit nil)))))))
 
 (defun anzu--check-minibuffer-input (buf beg end use-regexp overlay-limit)
   (let* ((content (minibuffer-contents))
