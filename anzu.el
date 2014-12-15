@@ -298,8 +298,8 @@
   (let ((prompt (anzu--query-prompt-base use-region use-regexp)))
     (if (and query-replace-defaults (not at-cursor))
         (format "%s (default %s -> %s) " prompt
-                (query-replace-descr (car query-replace-defaults))
-                (query-replace-descr (cdr query-replace-defaults)))
+                (query-replace-descr (caar query-replace-defaults))
+                (query-replace-descr (cdar query-replace-defaults)))
       prompt)))
 
 (defvar anzu--replaced-markers nil)
@@ -426,9 +426,9 @@
     (when (and (not is-empty) (not query-replace-defaults))
       (setq anzu--last-replaced-count anzu--total-matched))
     (if (and is-empty query-replace-defaults)
-        (cons (car query-replace-defaults)
+        (cons (caar query-replace-defaults)
               (query-replace-compile-replacement
-               (cdr query-replace-defaults) use-regexp))
+               (cdar query-replace-defaults) use-regexp))
       (add-to-history query-replace-from-history-variable from nil t)
       (when use-regexp
         (anzu--query-validate-from-regexp from))
@@ -533,7 +533,7 @@
   (query-replace-compile-replacement
    (let ((to (anzu--read-to-string from prompt beg end use-regexp overlay-limit)))
      (add-to-history query-replace-to-history-variable to nil t)
-     (setq query-replace-defaults (cons from to))
+     (add-to-history 'query-replace-defaults (cons from to) nil t)
      to)
    use-regexp))
 
