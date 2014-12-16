@@ -1,5 +1,12 @@
 Revision history for anzu.el
 
+Revision 0.44 2014/12/16 syohex
+   - Improve replacement commands
+     - show case sensitive replacement text
+   - Fix storing replacement history format issue
+     - We could not use anzu replace commands with normal replacement
+       commands such as query-replace etc.
+
 Revision 0.43 2014/11/30 syohex
    - Re-factoring for using migemo variable(Thanks lunaryorn)
 
