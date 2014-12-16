@@ -298,8 +298,8 @@
   (let ((prompt (anzu--query-prompt-base use-region use-regexp)))
     (if (and query-replace-defaults (not at-cursor))
         (format "%s (default %s -> %s) " prompt
-                (query-replace-descr (car query-replace-defaults))
-                (query-replace-descr (cdr query-replace-defaults)))
+                (query-replace-descr (caar query-replace-defaults))
+                (query-replace-descr (cdar query-replace-defaults)))
       prompt)))
 
 (defvar anzu--replaced-markers nil)
@@ -308,9 +308,8 @@
     (set-marker m beg buf)
     (push m anzu--replaced-markers)))
 
-(defun anzu--add-overlay (regexp beg end)
+(defun anzu--add-overlay (beg end)
   (let ((ov (make-overlay beg end)))
-    (overlay-put ov 'from-regexp regexp)
     (overlay-put ov 'from-string (buffer-substring-no-properties beg end))
     (overlay-put ov 'face 'anzu-replace-highlight)
     (overlay-put ov 'anzu-replace t)))
@@ -349,19 +348,20 @@
                 (when (and (>= beg overlay-beg) (<= end overlay-end) (not finish))
                   (cl-incf overlayed)
                   (anzu--set-marker beg buf)
-                  (anzu--add-overlay str beg end))))
+                  (anzu--add-overlay beg end))))
             (setq anzu--cached-count count)
             overlayed))))))
 
 (defun anzu--search-outside-visible (buf input beg end use-regexp)
   (let ((searchfn (if use-regexp 're-search-forward 'search-forward)))
-    (with-selected-window (get-buffer-window buf)
-      (goto-char beg)
-      (when (funcall searchfn input end t)
-        (setq anzu--outside-point (match-beginning 0))
-        (let ((overlay-limit (anzu--overlay-limit)))
-          (anzu--count-and-highlight-matched buf input beg end use-regexp
-                                             overlay-limit nil))))))
+    (when (or (not use-regexp) (anzu--validate-regexp input))
+      (with-selected-window (get-buffer-window buf)
+        (goto-char beg)
+        (when (funcall searchfn input end t)
+          (setq anzu--outside-point (match-beginning 0))
+          (let ((overlay-limit (anzu--overlay-limit)))
+            (anzu--count-and-highlight-matched buf input beg end use-regexp
+                                               overlay-limit nil)))))))
 
 (defun anzu--check-minibuffer-input (buf beg end use-regexp overlay-limit)
   (let* ((content (minibuffer-contents))
@@ -426,9 +426,9 @@
     (when (and (not is-empty) (not query-replace-defaults))
       (setq anzu--last-replaced-count anzu--total-matched))
     (if (and is-empty query-replace-defaults)
-        (cons (car query-replace-defaults)
+        (cons (caar query-replace-defaults)
               (query-replace-compile-replacement
-               (cdr query-replace-defaults) use-regexp))
+               (cdar query-replace-defaults) use-regexp))
       (add-to-history query-replace-from-history-variable from nil t)
       (when use-regexp
         (anzu--query-validate-from-regexp from))
@@ -442,9 +442,8 @@
           ((and (consp compiled) (stringp (car compiled)))
            (car compiled)))))
 
-(defun anzu--evaluate-occurrence (ov to-regexp replacements)
-  (let ((from-regexp (overlay-get ov 'from-regexp))
-        (from-string (overlay-get ov 'from-string))
+(defun anzu--evaluate-occurrence (ov to-regexp replacements fixed-case from-regexp)
+  (let ((from-string (overlay-get ov 'from-string))
         (compiled (anzu--compile-replace-text to-regexp)))
     (with-temp-buffer
       (insert from-string)
@@ -453,8 +452,8 @@
         (or (ignore-errors
               (if (consp compiled)
                   (replace-match (funcall (car compiled) (cdr compiled)
-                                          replacements) t)
-                (replace-match compiled t))
+                                          replacements) fixed-case)
+                (replace-match compiled fixed-case))
               (buffer-substring (point-min) (point-max)))
             "")))))
 
@@ -471,19 +470,27 @@
   (let ((separator (or anzu-replace-to-string-separator "")))
     (propertize (concat separator str) 'face 'anzu-replace-to)))
 
-(defun anzu--append-replaced-string (buf beg end use-regexp overlay-limit)
+(defsubst anzu--replaced-literal-string (ov replaced from)
+  (let ((str (buffer-substring-no-properties
+              (overlay-start ov) (overlay-end ov))))
+    (when (string-match str from)
+      (replace-match replaced (not case-fold-search) nil str))))
+
+(defun anzu--append-replaced-string (buf beg end use-regexp overlay-limit from)
   (let ((content (minibuffer-contents))
         (replacements 0))
     (unless (string= content anzu--last-replace-input)
       (setq anzu--last-replace-input content)
       (with-current-buffer buf
-        (dolist (ov (anzu--overlays-in-range beg (min end overlay-limit)))
-          (let ((replace-evaled (and use-regexp (anzu--evaluate-occurrence
-                                                 ov content replacements))))
-            (if replace-evaled
-                (cl-incf replacements)
-              (setq replace-evaled content))
-            (overlay-put ov 'after-string (anzu--propertize-to-string replace-evaled))))))))
+        (let ((case-fold-search (anzu--case-fold-search from)))
+          (dolist (ov (anzu--overlays-in-range beg (min end overlay-limit)))
+            (let ((replace-evaled
+                   (if (not use-regexp)
+                       (anzu--replaced-literal-string ov content from)
+                     (prog1 (anzu--evaluate-occurrence ov content replacements
+                                                       (not case-fold-search) from)
+                       (cl-incf replacements)))))
+              (overlay-put ov 'after-string (anzu--propertize-to-string replace-evaled)))))))))
 
 (defsubst anzu--outside-overlay-limit (orig-beg orig-limit)
   (save-excursion
@@ -511,7 +518,7 @@
                                (with-selected-window (or (active-minibuffer-window)
                                                          (minibuffer-window))
                                  (anzu--append-replaced-string
-                                  curbuf beg end use-regexp overlay-limit))))))
+                                  curbuf beg end use-regexp overlay-limit from))))))
           (prog1 (read-from-minibuffer to-prompt
                                        nil nil nil
                                        query-replace-from-history-variable nil t)
@@ -526,7 +533,7 @@
   (query-replace-compile-replacement
    (let ((to (anzu--read-to-string from prompt beg end use-regexp overlay-limit)))
      (add-to-history query-replace-to-history-variable to nil t)
-     (setq query-replace-defaults (cons from to))
+     (add-to-history 'query-replace-defaults (cons from to) nil t)
      to)
    use-regexp))
 
