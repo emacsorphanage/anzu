@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.45 2015/01/09 syohex
+   - Disable blink-matching-paren in replace commands
+
 Revision 0.44 2014/12/16 syohex
    - Improve replacement commands
      - show case sensitive replacement text
