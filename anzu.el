@@ -503,6 +503,7 @@
         (orig-beg beg)
         (to-prompt (format "%s %s with: " prompt (query-replace-descr from)))
         (history-add-new-input nil)
+        (blink-matching-paren nil)
         timer is-input)
     (setq anzu--last-replace-input "")
     (when anzu--outside-point
