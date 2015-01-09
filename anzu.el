@@ -387,6 +387,7 @@
 
 (defun anzu--read-from-string (prompt beg end use-regexp overlay-limit)
   (let ((curbuf (current-buffer))
+        (blink-matching-paren nil)
         timer is-input)
     (unwind-protect
         (minibuffer-with-setup-hook
