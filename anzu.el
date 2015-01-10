@@ -203,18 +203,21 @@
        (eq isearch-regexp (cdr anzu--last-search-state))
        (string= input anzu--last-isearch-string)))
 
-(defun anzu--update ()
-  (when (>= (length isearch-string) anzu-minimum-input-length)
-    (let ((result (if (anzu--use-result-cache-p isearch-string)
+(defun anzu--update (query)
+  (when (>= (length query) anzu-minimum-input-length)
+    (let ((result (if (anzu--use-result-cache-p query)
                       anzu--cached-positions
-                    (anzu--search-all-position isearch-string))))
+                    (anzu--search-all-position query))))
       (let ((curpos (anzu--where-is-here (plist-get result :positions) (point))))
         (setq anzu--total-matched (plist-get result :count)
               anzu--overflow-p (plist-get result :overflow)
               anzu--current-position curpos
               anzu--last-search-state (cons isearch-word isearch-regexp)
-              anzu--last-isearch-string isearch-string)
+              anzu--last-isearch-string query)
         (force-mode-line-update)))))
+
+(defun anzu--update-post-hook ()
+  (anzu--update isearch-string))
 
 (defconst anzu--mode-line-format '(:eval (anzu--update-mode-line)))
 
@@ -272,10 +275,10 @@
   :lighter    anzu-mode-lighter
   (if anzu-mode
       (progn
-        (add-hook 'isearch-update-post-hook 'anzu--update nil t)
+        (add-hook 'isearch-update-post-hook 'anzu--update-post-hook nil t)
         (add-hook 'isearch-mode-hook 'anzu--cons-mode-line-search nil t)
         (add-hook 'isearch-mode-end-hook 'anzu--reset-mode-line nil t))
-    (remove-hook 'isearch-update-post-hook 'anzu--update t)
+    (remove-hook 'isearch-update-post-hook 'anzu--update-post-hook t)
     (remove-hook 'isearch-mode-hook 'anzu--cons-mode-line t)
     (remove-hook 'isearch-mode-end-hook 'anzu--reset-mode-line t)
     (anzu--reset-mode-line)))
