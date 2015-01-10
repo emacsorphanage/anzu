@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.46 2015/01/10 syohex
+   - Refactoring for evil-anzu
+
 Revision 0.45 2015/01/09 syohex
    - Disable blink-matching-paren in replace commands
 
