@@ -350,7 +350,6 @@
                     (forward-char 1)))
                 (when (and (>= beg overlay-beg) (<= end overlay-end) (not finish))
                   (cl-incf overlayed)
-                  (anzu--set-marker beg buf)
                   (anzu--add-overlay beg end))))
             (setq anzu--cached-count count)
             overlayed))))))
@@ -615,7 +614,7 @@
 
 (defsubst anzu--current-replaced-index (curpoint)
   (cl-loop for m in anzu--replaced-markers
-           for i = 1 then (+ i 1)
+           for i = 1 then (1+ i)
            for pos = (marker-position m)
            when (= pos curpoint)
            return i))
@@ -626,6 +625,14 @@
       (when (or (not index) (/= index anzu--current-position))
         (force-mode-line-update)
         (setq anzu--current-position (or index 1))))))
+
+(defun anzu--set-replaced-markers (from beg end use-regexp)
+  (save-excursion
+    (goto-char beg)
+    (cl-loop with curbuf = (current-buffer)
+             with search-func = (if use-regexp 're-search-forward 'search-forward)
+             while (funcall search-func from end t)
+             do (anzu--set-marker (match-beginning 0) curbuf))))
 
 (cl-defun anzu--query-replace-common (use-regexp &key at-cursor thing prefix-arg (query t))
   (anzu--cons-mode-line 'replace-query)
@@ -654,6 +661,7 @@
                      (anzu--query-replace-read-to
                       from prompt beg end use-regexp overlay-limit))))
           (anzu--clear-overlays curbuf beg end)
+          (anzu--set-replaced-markers from beg end use-regexp)
           (setq anzu--state 'replace anzu--current-position 0
                 anzu--replaced-markers (reverse anzu--replaced-markers)
                 clear-overlay t)
@@ -668,6 +676,7 @@
           (anzu--clear-overlays curbuf beg end))
         (when (zerop anzu--current-position)
           (goto-char orig-point))
+        (anzu--cleanup-markers)
         (anzu--reset-mode-line)
         (force-mode-line-update)))))
 
