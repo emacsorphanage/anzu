@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.47 2015/01/21 syohex
+   - Fix displaying wrong current position in replacement commands
+
 Revision 0.46 2015/01/10 syohex
    - Refactoring for evil-anzu
 
