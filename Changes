@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.48 2015/01/28 syohex
+   - Fix case when expression(,(...)) cannot be compiled.
+
 Revision 0.47 2015/01/21 syohex
    - Fix displaying wrong current position in replacement commands
 
