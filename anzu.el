@@ -438,27 +438,31 @@
       from)))
 
 (defun anzu--compile-replace-text (str)
-  (let ((compiled (query-replace-compile-replacement str t)))
-    (cond ((stringp compiled) compiled)
-          ((and (consp compiled) (functionp (car compiled)))
-           compiled)
-          ((and (consp compiled) (stringp (car compiled)))
-           (car compiled)))))
+  (let ((compiled (ignore-errors
+                    (query-replace-compile-replacement str t))))
+    (when compiled
+      (cond  ((stringp compiled) compiled)
+             ((and (consp compiled) (functionp (car compiled)))
+              compiled)
+             ((and (consp compiled) (stringp (car compiled)))
+              (car compiled))))))
 
 (defun anzu--evaluate-occurrence (ov to-regexp replacements fixed-case from-regexp)
   (let ((from-string (overlay-get ov 'from-string))
         (compiled (anzu--compile-replace-text to-regexp)))
-    (with-temp-buffer
-      (insert from-string)
-      (goto-char (point-min))
-      (when (re-search-forward from-regexp nil t)
-        (or (ignore-errors
-              (if (consp compiled)
-                  (replace-match (funcall (car compiled) (cdr compiled)
-                                          replacements) fixed-case)
-                (replace-match compiled fixed-case))
-              (buffer-substring (point-min) (point-max)))
-            "")))))
+    (if (not compiled)
+        ""
+      (with-temp-buffer
+        (insert from-string)
+        (goto-char (point-min))
+        (when (re-search-forward from-regexp nil t)
+          (or (ignore-errors
+                (if (consp compiled)
+                    (replace-match (funcall (car compiled) (cdr compiled)
+                                            replacements) fixed-case)
+                  (replace-match compiled fixed-case))
+                (buffer-substring (point-min) (point-max)))
+              ""))))))
 
 (defun anzu--overlay-sort (a b)
   (< (overlay-start a) (overlay-start b)))
