@@ -440,11 +440,12 @@
 (defun anzu--compile-replace-text (str)
   (let ((compiled (ignore-errors
                     (query-replace-compile-replacement str t))))
-    (cond ((stringp compiled) compiled)
-          ((and (consp compiled) (functionp (car compiled)))
-           compiled)
-          ((and (consp compiled) (stringp (car compiled)))
-           (car compiled)))))
+    (when compiled
+      (cond  ((stringp compiled) compiled)
+             ((and (consp compiled) (functionp (car compiled)))
+              compiled)
+             ((and (consp compiled) (stringp (car compiled)))
+              (car compiled))))))
 
 (defun anzu--evaluate-occurrence (ov to-regexp replacements fixed-case from-regexp)
   (let ((from-string (overlay-get ov 'from-string))
