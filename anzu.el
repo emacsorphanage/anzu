@@ -636,7 +636,13 @@
     (cl-loop with curbuf = (current-buffer)
              with search-func = (if use-regexp 're-search-forward 'search-forward)
              while (funcall search-func from end t)
-             do (anzu--set-marker (match-beginning 0) curbuf))))
+             do
+             (progn
+               (anzu--set-marker (match-beginning 0) curbuf)
+               (when (= (match-beginning 0) (match-end 0))
+                 (if (eobp)
+                     (cl-return nil)
+                   (forward-char 1)))))))
 
 (cl-defun anzu--query-replace-common (use-regexp &key at-cursor thing prefix-arg (query t))
   (anzu--cons-mode-line 'replace-query)
