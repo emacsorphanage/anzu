@@ -221,6 +221,9 @@
 
 (defconst anzu--mode-line-format '(:eval (anzu--update-mode-line)))
 
+(defsubst anzu--emacs25-p ()
+  (>= emacs-major-version 25))
+
 (defsubst anzu--mode-line-not-set-p ()
   (and (listp mode-line-format)
        (member anzu--mode-line-format mode-line-format)))
@@ -297,12 +300,20 @@
           (if use-regexp " regexp" "")
           (if use-region " in region" ""))  )
 
+(defsubst anzu--retrive-from-at-history ()
+  (let ((retrieve-func (if (anzu--emacs25-p) 'caar 'car)))
+    (query-replace-descr (funcall retrieve-func query-replace-defaults))))
+
+(defsubst anzu--retrive-to-at-history ()
+  (let ((retrieve-func (if (anzu--emacs25-p) 'cdar 'cdr)))
+    (query-replace-descr (funcall retrieve-func query-replace-defaults))))
+
 (defun anzu--query-prompt (use-region use-regexp at-cursor)
   (let ((prompt (anzu--query-prompt-base use-region use-regexp)))
     (if (and query-replace-defaults (not at-cursor))
         (format "%s (default %s -> %s) " prompt
-                (query-replace-descr (caar query-replace-defaults))
-                (query-replace-descr (cdar query-replace-defaults)))
+                (anzu--retrive-from-at-history)
+                (anzu--retrive-to-at-history))
       prompt)))
 
 (defvar anzu--replaced-markers nil)
@@ -429,9 +440,9 @@
     (when (and (not is-empty) (not query-replace-defaults))
       (setq anzu--last-replaced-count anzu--total-matched))
     (if (and is-empty query-replace-defaults)
-        (cons (caar query-replace-defaults)
+        (cons (anzu--retrive-from-at-history)
               (query-replace-compile-replacement
-               (cdar query-replace-defaults) use-regexp))
+               (anzu--retrive-to-at-history) use-regexp))
       (add-to-history query-replace-from-history-variable from nil t)
       (when use-regexp
         (anzu--query-validate-from-regexp from))
@@ -541,7 +552,9 @@
   (query-replace-compile-replacement
    (let ((to (anzu--read-to-string from prompt beg end use-regexp overlay-limit)))
      (add-to-history query-replace-to-history-variable to nil t)
-     (add-to-history 'query-replace-defaults (cons from to) nil t)
+     (if (anzu--emacs25-p)
+         (add-to-history 'query-replace-defaults (cons from to) nil t)
+       (setq query-replace-defaults (cons from to)))
      to)
    use-regexp))
 
