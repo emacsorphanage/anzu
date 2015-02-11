@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.50 2015/02/11 syohex
+   - Fix Emacs 24 issue(Reported by LefterisJP)
+     Can't use both anzu replace commands and builtin replacements commands
+
 Revision 0.49 2015/02/04 syohex
    - Fix zero width replacement causes infinite loop issue(Reported by proofit404)
 
