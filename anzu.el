@@ -384,7 +384,7 @@
                         (get-text-property (match-beginning 0) 'separator content))
                (substring-no-properties content (match-end 0))))
          (from (or (and to (substring-no-properties content 0 (match-beginning 0)))
-                   (minibuffer-contents)))
+                   content))
          (empty-p (string= from ""))
          (overlayed (if empty-p
                         (setq anzu--cached-count 0)
