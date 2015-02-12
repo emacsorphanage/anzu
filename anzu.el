@@ -131,6 +131,7 @@
 (defvar anzu--last-replaced-count nil)
 (defvar anzu--outside-point nil)
 (defvar anzu--history nil)
+(defvar anzu--query-defaults nil)
 
 (defun anzu--validate-regexp (regexp)
   (condition-case nil
@@ -222,9 +223,6 @@
 
 (defconst anzu--mode-line-format '(:eval (anzu--update-mode-line)))
 
-(defsubst anzu--emacs25-p ()
-  (>= emacs-major-version 25))
-
 (defsubst anzu--mode-line-not-set-p ()
   (and (listp mode-line-format)
        (member anzu--mode-line-format mode-line-format)))
@@ -301,20 +299,13 @@
           (if use-regexp " regexp" "")
           (if use-region " in region" ""))  )
 
-(defsubst anzu--retrive-from-at-history ()
-  (let ((retrieve-func (if (anzu--emacs25-p) 'caar 'car)))
-    (query-replace-descr (funcall retrieve-func query-replace-defaults))))
-
-(defsubst anzu--retrive-to-at-history ()
-  (let ((retrieve-func (if (anzu--emacs25-p) 'cdar 'cdr)))
-    (query-replace-descr (funcall retrieve-func query-replace-defaults))))
-
 (defun anzu--query-prompt (use-region use-regexp at-cursor)
   (let ((prompt (anzu--query-prompt-base use-region use-regexp)))
-    (if (and query-replace-defaults (not at-cursor))
-        (format "%s (default %s -> %s) " prompt
-                (anzu--retrive-from-at-history)
-                (anzu--retrive-to-at-history))
+    (if (and anzu--query-defaults (not at-cursor))
+        (format "%s (default %s -> %s) "
+                prompt
+                (query-replace-descr (caar anzu--query-defaults))
+                (query-replace-descr (cdar anzu--query-defaults)))
       prompt)))
 
 (defvar anzu--replaced-markers nil)
@@ -389,8 +380,7 @@
 
 (defun anzu--check-minibuffer-input (buf beg end use-regexp overlay-limit)
   (let* ((content (minibuffer-contents))
-         (to (when (and (anzu--emacs25-p)
-                        (string-match (anzu--separator) content)
+         (to (when (and (string-match (anzu--separator) content)
                         (get-text-property (match-beginning 0) 'separator content))
                (substring-no-properties content (match-end 0))))
          (from (or (and to (substring-no-properties content 0 (match-beginning 0)))
@@ -424,17 +414,13 @@
                       (concat (query-replace-descr (car from-to))
                               separator
                               (query-replace-descr (cdr from-to))))
-                    query-replace-defaults)
+                    anzu--query-defaults)
             (symbol-value query-replace-from-history-variable))))
 
 (defun anzu--read-from-string (prompt beg end use-regexp overlay-limit)
   (let ((curbuf (current-buffer))
         (blink-matching-paren nil)
-        (anzu--history (when (anzu--emacs25-p)
-                         (anzu--transform-from-to-history)))
-        (history-var (if (anzu--emacs25-p)
-                         'anzu--history
-                       query-replace-from-history-variable))
+        (anzu--history (anzu--transform-from-to-history))
         timer is-input)
     (unwind-protect
         (minibuffer-with-setup-hook
@@ -449,7 +435,7 @@
                                  (anzu--check-minibuffer-input
                                   curbuf beg end use-regexp overlay-limit))))))
           (prog1 (read-from-minibuffer (format "%s: " prompt)
-                                       nil nil nil history-var nil t)
+                                       nil nil nil 'anzu--history nil t)
             (setq is-input t)))
       (when timer
         (cancel-timer timer)
@@ -470,12 +456,12 @@
 (defun anzu--query-from-string (prompt beg end use-regexp overlay-limit)
   (let* ((from (anzu--read-from-string prompt beg end use-regexp overlay-limit))
          (is-empty (string= from "")))
-    (when (and (not is-empty) (not query-replace-defaults))
+    (when (and (not is-empty) (not anzu--query-defaults))
       (setq anzu--last-replaced-count anzu--total-matched))
-    (if (and is-empty query-replace-defaults)
-        (cons (anzu--retrive-from-at-history)
+    (if (and is-empty anzu--query-defaults)
+        (cons (query-replace-descr (caar anzu--query-defaults))
               (query-replace-compile-replacement
-               (anzu--retrive-to-at-history) use-regexp))
+               (query-replace-descr (cdar anzu--query-defaults)) use-regexp))
       (add-to-history query-replace-from-history-variable from nil t)
       (when use-regexp
         (anzu--query-validate-from-regexp from))
@@ -585,9 +571,7 @@
   (query-replace-compile-replacement
    (let ((to (anzu--read-to-string from prompt beg end use-regexp overlay-limit)))
      (add-to-history query-replace-to-history-variable to nil t)
-     (if (anzu--emacs25-p)
-         (add-to-history 'query-replace-defaults (cons from to) nil t)
-       (setq query-replace-defaults (cons from to)))
+     (add-to-history 'anzu--query-defaults (cons from to) nil t)
      to)
    use-regexp))
 
