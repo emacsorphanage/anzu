@@ -153,7 +153,7 @@
 
 (defun anzu--transform-input (str)
   (cond ((eq isearch-word 'isearch-symbol-regexp)
-         (setq str (concat "\\_<" str "\\_>")))
+         (setq str (isearch-symbol-regexp str)))
         ((anzu--word-search-p)
          (setq str (regexp-quote str)))
         (t str)))
