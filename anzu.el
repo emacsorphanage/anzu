@@ -130,6 +130,7 @@
 (defvar anzu--last-search-state nil)
 (defvar anzu--last-replaced-count nil)
 (defvar anzu--outside-point nil)
+(defvar anzu--history nil)
 
 (defun anzu--validate-regexp (regexp)
   (condition-case nil
@@ -376,19 +377,38 @@
             (anzu--count-and-highlight-matched buf input beg end use-regexp
                                                overlay-limit nil)))))))
 
+(defconst anzu--from-to-separator
+  (propertize
+   (or (ignore-errors
+	 (if (char-displayable-p ?\u2192) " \u2192 " " -> "))
+       " -> ")
+   'face 'minibuffer-prompt))
+
+(defsubst anzu--separator ()
+  (propertize "\0" 'display anzu--from-to-separator 'separator t))
+
 (defun anzu--check-minibuffer-input (buf beg end use-regexp overlay-limit)
   (let* ((content (minibuffer-contents))
-         (empty-p (string= content ""))
+         (to (when (and (anzu--emacs25-p)
+                        (string-match (anzu--separator) content)
+                        (get-text-property (match-beginning 0) 'separator content))
+               (substring-no-properties content (match-end 0))))
+         (from (or (and to (substring-no-properties content 0 (match-beginning 0)))
+                   (minibuffer-contents)))
+         (empty-p (string= from ""))
          (overlayed (if empty-p
                         (setq anzu--cached-count 0)
-                      (anzu--count-and-highlight-matched buf content beg end use-regexp
+                      (anzu--count-and-highlight-matched buf from beg end use-regexp
                                                          overlay-limit nil))))
     (when anzu--outside-point
       (setq anzu--outside-point nil)
       (with-selected-window (get-buffer-window buf)
         (goto-char beg)))
     (when (and (not empty-p) (zerop overlayed))
-      (anzu--search-outside-visible buf content beg end use-regexp))
+      (anzu--search-outside-visible buf from beg end use-regexp))
+    (when to
+      (setq anzu--last-replace-input "")
+      (anzu--append-replaced-string to buf beg end use-regexp overlay-limit from))
     (setq anzu--total-matched anzu--cached-count)
     (force-mode-line-update)))
 
@@ -398,9 +418,23 @@
       (when (overlay-get ov 'anzu-replace)
         (delete-overlay ov)))))
 
+(defun anzu--transform-from-to-history ()
+  (let ((separator (anzu--separator)))
+    (append (mapcar (lambda (from-to)
+                      (concat (query-replace-descr (car from-to))
+                              separator
+                              (query-replace-descr (cdr from-to))))
+                    query-replace-defaults)
+            (symbol-value query-replace-from-history-variable))))
+
 (defun anzu--read-from-string (prompt beg end use-regexp overlay-limit)
   (let ((curbuf (current-buffer))
         (blink-matching-paren nil)
+        (anzu--history (when (anzu--emacs25-p)
+                         (anzu--transform-from-to-history)))
+        (history-var (if (anzu--emacs25-p)
+                         'anzu--history
+                       query-replace-from-history-variable))
         timer is-input)
     (unwind-protect
         (minibuffer-with-setup-hook
@@ -415,8 +449,7 @@
                                  (anzu--check-minibuffer-input
                                   curbuf beg end use-regexp overlay-limit))))))
           (prog1 (read-from-minibuffer (format "%s: " prompt)
-                                       nil nil nil
-                                       query-replace-from-history-variable nil t)
+                                       nil nil nil history-var nil t)
             (setq is-input t)))
       (when timer
         (cancel-timer timer)
@@ -494,9 +527,8 @@
     (when (string-match str from)
       (replace-match replaced (not case-fold-search) nil str))))
 
-(defun anzu--append-replaced-string (buf beg end use-regexp overlay-limit from)
-  (let ((content (minibuffer-contents))
-        (replacements 0))
+(defun anzu--append-replaced-string (content buf beg end use-regexp overlay-limit from)
+  (let ((replacements 0))
     (unless (string= content anzu--last-replace-input)
       (setq anzu--last-replace-input content)
       (with-current-buffer buf
@@ -537,6 +569,7 @@
                                (with-selected-window (or (active-minibuffer-window)
                                                          (minibuffer-window))
                                  (anzu--append-replaced-string
+                                  (minibuffer-contents)
                                   curbuf beg end use-regexp overlay-limit from))))))
           (prog1 (read-from-minibuffer to-prompt
                                        nil nil nil
@@ -677,12 +710,16 @@
                            (setq delimited nil)
                            (anzu--query-from-at-cursor curbuf beg end overlay-limit))
                        (anzu--query-from-string prompt beg end use-regexp overlay-limit)))
-               (to (if (consp from)
-                       (prog1 (cdr from)
-                         (setq from (car from)
-                               anzu--total-matched anzu--last-replaced-count))
-                     (anzu--query-replace-read-to
-                      from prompt beg end use-regexp overlay-limit))))
+               (to (cond ((string-match "\0" from)
+                          (prog1 (substring-no-properties from (match-end 0))
+                            (setq from (substring-no-properties from 0 (match-beginning 0)))))
+                         ((consp from)
+                          (prog1 (cdr from)
+                            (setq from (car from)
+                                  anzu--total-matched anzu--last-replaced-count)))
+                         (t
+                          (anzu--query-replace-read-to
+                           from prompt beg end use-regexp overlay-limit)))))
           (anzu--clear-overlays curbuf beg end)
           (anzu--set-replaced-markers from beg end use-regexp)
           (setq anzu--state 'replace anzu--current-position 0
