@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.51 2015/02/18 syohex
+   - Improve new history feature of Emacs 25
+     (This feature works on both Emacs 24 and 25)
+
 Revision 0.50 2015/02/11 syohex
    - Fix Emacs 24 issue(Reported by LefterisJP)
      Can't use both anzu replace commands and builtin replacements commands
