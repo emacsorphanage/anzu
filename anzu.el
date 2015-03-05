@@ -110,6 +110,33 @@
   "highlight of replaced string"
   :group 'anzu)
 
+(defface anzu-match-1
+  '((((class color) (background light))
+     :background "aquamarine" :foreground "black")
+    (((class color) (background dark))
+     :background "limegreen" :foreground "black")
+    (t :inverse-video t))
+  "First group of match."
+  :group 'anzu)
+
+(defface anzu-match-2
+  '((((class color) (background light))
+     :background "springgreen" :foreground "black")
+    (((class color) (background dark))
+     :background "yellow" :foreground "black")
+    (t :inverse-video t))
+  "Second group of match."
+  :group 'anzu)
+
+(defface anzu-match-3
+  '((((class color) (background light))
+     :background "yellow" :foreground "black")
+    (((class color) (background dark))
+     :background "aquamarine" :foreground "black")
+    (t :inverse-video t))
+  "Third group of match."
+  :group 'anzu)
+
 (defface anzu-replace-to
   '((((class color) (background light))
      :foreground "red")
@@ -314,11 +341,31 @@
     (set-marker m beg buf)
     (push m anzu--replaced-markers)))
 
+(defun anzu--make-overlay (begin end face prio)
+  (let ((ov (make-overlay begin end)))
+    (overlay-put ov 'face face)
+    (overlay-put ov 'priority prio)
+    (overlay-put ov 'anzu-overlay t)
+    ov))
+
+(defun anzu--add-match-group-overlay (match-data groups)
+  (when (>= groups 3)
+    (anzu--make-overlay (cl-fifth match-data) (cl-sixth match-data)
+                        'anzu-match-3 1001))
+  (when (>= groups 2)
+    (anzu--make-overlay (cl-third match-data) (cl-fourth match-data)
+                        'anzu-match-2 1001))
+  (anzu--make-overlay (cl-first match-data) (cl-second match-data)
+                      'anzu-match-1 1001))
+
 (defun anzu--add-overlay (beg end)
-  (let ((ov (make-overlay beg end)))
-    (overlay-put ov 'from-string (buffer-substring-no-properties beg end))
-    (overlay-put ov 'face 'anzu-replace-highlight)
-    (overlay-put ov 'anzu-replace t)))
+  (let* ((match-data (match-data))
+         (groups (/ (- (length match-data) 2) 2)))
+    (when (>= groups 1)
+      (anzu--add-match-group-overlay (cddr match-data) groups))
+    (let ((ov (anzu--make-overlay beg end 'anzu-replace-highlight 1000)))
+      (overlay-put ov 'from-string (buffer-substring-no-properties beg end))
+      (overlay-put ov 'anzu-replace t))))
 
 (defsubst anzu--cleanup-markers ()
   (mapc (lambda (m) (set-marker m nil)) anzu--replaced-markers)
@@ -405,7 +452,7 @@
 (defun anzu--clear-overlays (buf beg end)
   (with-current-buffer buf
     (dolist (ov (overlays-in (or beg (point-min)) (or end (point-max))))
-      (when (overlay-get ov 'anzu-replace)
+      (when (overlay-get ov 'anzu-overlay)
         (delete-overlay ov)))))
 
 (defun anzu--transform-from-to-history ()
