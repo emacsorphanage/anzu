@@ -511,6 +511,8 @@
                (query-replace-descr (cdar anzu--query-defaults)) use-regexp))
       (add-to-history query-replace-from-history-variable from nil t)
       (when use-regexp
+        (unless (anzu--validate-regexp from)
+          (error "'%s' is invalid regexp." from))
         (anzu--query-validate-from-regexp from))
       from)))
 
