@@ -557,7 +557,7 @@
 (defsubst anzu--replaced-literal-string (ov replaced from)
   (let ((str (buffer-substring-no-properties
               (overlay-start ov) (overlay-end ov))))
-    (when (string-match str from)
+    (when (string-match (regexp-quote str) from)
       (replace-match replaced (not case-fold-search) nil str))))
 
 (defun anzu--append-replaced-string (content buf beg end use-regexp overlay-limit from)
