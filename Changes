@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.53 2015/05/18 syohex
+   - Fix raising invalid regexp error issue(Thanks kosh04)
+   - Valid replaced regular expression in regexp replace commands
+
 Revision 0.52 2015/02/22 syohex
    - Fix default input issue(Reported by pronobis)
 
