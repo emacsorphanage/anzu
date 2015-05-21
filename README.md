@@ -15,7 +15,7 @@ information in the mode-line in various search modes.
 ## Requirements
 
 * Emacs 24 or higher
-* `cl-lib` 0.3 or higher (you don't need to install `cl-lib` if you use Emacs 24.3 or higher)
+* `cl-lib` 0.5 or higher (you don't need to install `cl-lib` if you use Emacs 24.3 or higher)
 
 
 ## Installation
