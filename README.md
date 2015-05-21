@@ -99,13 +99,19 @@ Face of to-string of replacement
 #### `anzu-mode-line-update-function`
 
 Function which constructs mode-line string. If you color mode-line string,
-you propertize string by yourself.
+you propertize string by yourself. The function takes 2 interger arguments, current position,
+and total matched. This function is called at searching, inputing replaced word,
+replacing. Global variable `anzu--state` indicates those states(`'search`, `'replace-query`, `replace`).
 
 ```lisp
 (defun my/anzu-update-func (here total)
-  (propertize (format "<%d/%d>" here total)
-              'face '((:foreground "yellow" :weight bold))))
-(setq anzu-mode-line-update-function my/anzu-update-func)
+  (when anzu--state
+    (let ((status (cl-case anzu--state
+                    (search (format "<%d/%d>" here total))
+                    (replace-query (format "(%d Replaces)" total))
+                    (replace (format "<%d/%d>" here total)))))
+      (propertize status 'face 'anzu-mode-line))))
+(setq anzu-mode-line-update-function #'my/anzu-update-func)
 ```
 
 #### `anzu-cons-mode-line-p`(Default is `t`)
