@@ -99,8 +99,8 @@ Face of to-string of replacement
 #### `anzu-mode-line-update-function`
 
 Function which constructs mode-line string. If you color mode-line string,
-you propertize string by yourself. The function takes 2 interger arguments, current position,
-and total matched. This function is called at searching, inputing replaced word,
+you propertize string by yourself. The function takes 2 integer arguments, current position,
+and total matched. This function is called at searching, inputting replaced word,
 replacing. Global variable `anzu--state` indicates those states(`'search`, `'replace-query`, `replace`).
 
 ```lisp
@@ -139,7 +139,7 @@ Mode name in `mode-line`. Default is ` Anzu`.
 
 #### `anzu-input-idle-delay`(Default is `0.05`)
 
-Delay second of updating modeline information when you input from-string
+Delay second of updating mode-line information when you input from-string
 
 #### `anzu-regexp-search-commands`
 
