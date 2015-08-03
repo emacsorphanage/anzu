@@ -308,7 +308,7 @@
         (add-hook 'isearch-mode-hook 'anzu--cons-mode-line-search nil t)
         (add-hook 'isearch-mode-end-hook 'anzu--reset-mode-line nil t))
     (remove-hook 'isearch-update-post-hook 'anzu--update-post-hook t)
-    (remove-hook 'isearch-mode-hook 'anzu--cons-mode-line t)
+    (remove-hook 'isearch-mode-hook 'anzu--cons-mode-line-search t)
     (remove-hook 'isearch-mode-end-hook 'anzu--reset-mode-line t)
     (anzu--reset-mode-line)))
 
