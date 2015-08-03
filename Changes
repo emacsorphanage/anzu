@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.54 2015/08/03 syohex
+   - Correct removed hook function name. This makes anzu information is shown if anzu-mode
+     is disabled.
+
 Revision 0.53 2015/05/18 syohex
    - Fix raising invalid regexp error issue(Thanks kosh04)
    - Valid replaced regular expression in regexp replace commands
