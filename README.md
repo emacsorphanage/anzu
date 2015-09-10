@@ -199,7 +199,7 @@ Separator of `to` string.
  '(anzu-replace-to-string-separator " => "))
 ```
 
-[melpa-link]: http://melpa.org/#/anzu
-[melpa-stable-link]: http://stable.melpa.org/#/anzu
-[melpa-badge]: http://melpa.org/packages/anzu-badge.svg
-[melpa-stable-badge]: http://stable.melpa.org/packages/anzu-badge.svg
+[melpa-link]: https://melpa.org/#/anzu
+[melpa-stable-link]: https://stable.melpa.org/#/anzu
+[melpa-badge]: https://melpa.org/packages/anzu-badge.svg
+[melpa-stable-badge]: https://stable.melpa.org/packages/anzu-badge.svg
