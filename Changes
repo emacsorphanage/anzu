@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.55 2015/09/11 syohex
+   - anzu--status declare as buffer local variable
+
 Revision 0.54 2015/08/03 syohex
    - Correct removed hook function name. This makes anzu information is shown if anzu-mode
      is disabled.
