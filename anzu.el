@@ -304,6 +304,7 @@
   :lighter    anzu-mode-lighter
   (if anzu-mode
       (progn
+        (set (make-local-variable 'anzu--state) nil)
         (add-hook 'isearch-update-post-hook 'anzu--update-post-hook nil t)
         (add-hook 'isearch-mode-hook 'anzu--cons-mode-line-search nil t)
         (add-hook 'isearch-mode-end-hook 'anzu--reset-mode-line nil t))
