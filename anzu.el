@@ -561,7 +561,7 @@
   (let ((str (buffer-substring-no-properties
               (overlay-start ov) (overlay-end ov))))
     (when (string-match (regexp-quote str) from)
-      (replace-match replaced (not case-fold-search) nil str))))
+      (replace-match replaced (not case-fold-search) t str))))
 
 (defun anzu--append-replaced-string (content buf beg end use-regexp overlay-limit from)
   (let ((replacements 0))
