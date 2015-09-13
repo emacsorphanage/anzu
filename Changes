@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.56 2015/09/13 syohex
+   - Fix literal replacement issue(#60 Thanks kosh04)
+
 Revision 0.55 2015/09/11 syohex
    - anzu--status declare as buffer local variable
 
