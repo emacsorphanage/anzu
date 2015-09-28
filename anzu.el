@@ -204,7 +204,9 @@
               (overflow nil)
               (finish nil)
               (search-func (if (anzu--use-migemo-p)
-                               'migemo-forward
+                               (lambda (word &optional bound noerror count)
+                                 (ignore-errors
+                                   (migemo-forward word bound noerror count)))
                              're-search-forward))
               (case-fold-search (anzu--case-fold-search input)))
           (while (and (not finish) (funcall search-func input nil t))
