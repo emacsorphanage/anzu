@@ -209,7 +209,10 @@
                                    (migemo-forward word bound noerror count)))
                              're-search-forward))
               (case-fold-search (anzu--case-fold-search input)))
-          (while (and (not finish) (funcall search-func input nil t))
+          (while (and (not finish)
+                      (condition-case nil
+                          (funcall search-func input nil t)
+                        (invalid-regexp nil)))
             (push (cons (match-beginning 0) (match-end 0)) positions)
             (cl-incf count)
             (when (= (match-beginning 0) (match-end 0)) ;; Case of anchor such as "^"
