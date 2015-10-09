@@ -39,6 +39,8 @@
 (require 'cl-lib)
 (require 'thingatpt)
 
+(declare-function migemo-forward 'migemo)
+
 (defgroup anzu nil
   "Show searched position in mode-line"
   :group 'isearch)
