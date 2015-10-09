@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.58 2015/10/09 syohex
+   - Fix byte-compile warning(#63 Thanks tarsius)
+
 Revision 0.57 2015/09/29 syohex
    - Fix about migemo exception(#62 Reported by kosh04)
 
