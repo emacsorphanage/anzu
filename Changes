@@ -1,5 +1,8 @@
 Revision history for anzu.el
 
+Revision 0.59 2015/10/15 syohex
+   - Fix replacement around region issue(#63 Thanks akicho8)
+
 Revision 0.58 2015/10/09 syohex
    - Fix byte-compile warning(#63 Thanks tarsius)
 
