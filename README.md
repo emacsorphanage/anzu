@@ -116,7 +116,7 @@ replacing. Global variable `anzu--state` indicates those states(`'search`, `'rep
 
 #### `anzu-cons-mode-line-p`(Default is `t`)
 
-Set `nil` if you want to display anzu information at any posion in mode-line.
+Set `nil` if you want to display anzu information at any position in mode-line.
 `anzu.el` cons search information head of `mode-line` as default.
 
 For example, show search information tail of `minor-mode-alist`
