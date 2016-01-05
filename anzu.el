@@ -66,6 +66,12 @@
                  (boolean :tag "No threshold" nil))
   :group 'anzu)
 
+(defcustom anzu-replace-threshold nil
+  "Limit of replacement overlays."
+  :type '(choice (integer :tag "Threshold of replacement overlays")
+                 (boolean :tag "No threshold" nil))
+  :group 'anzu)
+
 (defcustom anzu-use-migemo nil
   "Flag of using migemo"
   :type 'boolean
@@ -555,7 +561,12 @@
   (cl-loop for ov in (overlays-in beg end)
            when (overlay-get ov 'anzu-replace)
            collect ov into anzu-overlays
-           finally return (sort anzu-overlays 'anzu--overlay-sort)))
+           finally
+           return
+           (let ((sorted (sort anzu-overlays 'anzu--overlay-sort)))
+             (if anzu-replace-threshold
+                 (cl-subseq sorted 0 (min (length sorted) anzu-replace-threshold))
+               sorted))))
 
 (defsubst anzu--propertize-to-string (str)
   (let ((separator (or anzu-replace-to-string-separator "")))
