@@ -14,13 +14,13 @@ information in the mode-line in various search modes.
 
 ## Requirements
 
-* Emacs 24 or higher
-* `cl-lib` 0.5 or higher (you don't need to install `cl-lib` if you use Emacs 24.3 or higher)
+- Emacs 24 or higher
+- `cl-lib` 0.5 or higher (you don't need to install `cl-lib` if you use Emacs 24.3 or higher)
 
 
 ## Installation
 
-You can install `anzu.el` from [MELPA](http://melpa.org/) with `package.el`
+You can install `anzu.el` from [MELPA](https://melpa.org/) with `package.el`
 
 ```
  M-x package-install anzu
@@ -29,20 +29,20 @@ You can install `anzu.el` from [MELPA](http://melpa.org/) with `package.el`
 
 ## Basic Usage
 
-#### `anzu-mode`
-
-Enable anzu minor mode:
-
-```lisp
-(anzu-mode +1)
-```
-
 #### `global-anzu-mode`
 
 Enable global anzu mode:
 
 ```lisp
 (global-anzu-mode +1)
+```
+
+#### `anzu-mode`
+
+Enable anzu minor mode:
+
+```lisp
+(anzu-mode +1)
 ```
 
 #### `anzu-query-replace`
@@ -160,6 +160,9 @@ If this value is `nil`, `anzu.el` counts all words.
 
 ![anzu-threshold](image/anzu-threshold.png)
 
+#### `anzu-replace-threshold`(Default is `nil`)
+
+Threshold of replacement overlay. If this value is `nil`,
 
 #### `anzu-minimum-input-length`(Default is 1)
 
@@ -196,6 +199,7 @@ Separator of `to` string.
  '(anzu-mode-lighter "")
  '(anzu-deactivate-region t)
  '(anzu-search-threshold 1000)
+ '(anzu-replace-threshold 50)
  '(anzu-replace-to-string-separator " => "))
 ```
 

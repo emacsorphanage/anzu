@@ -1,6 +1,6 @@
 ;;; anzu.el --- Show number of matches in mode-line while searching -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015 by Syohei YOSHIDA
+;; Copyright (C) 2016 by Syohei YOSHIDA
 
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; URL: https://github.com/syohex/emacs-anzu
@@ -63,6 +63,12 @@
 (defcustom anzu-search-threshold nil
   "Limit of search number"
   :type '(choice (integer :tag "Threshold of search")
+                 (boolean :tag "No threshold" nil))
+  :group 'anzu)
+
+(defcustom anzu-replace-threshold nil
+  "Limit of replacement overlays."
+  :type '(choice (integer :tag "Threshold of replacement overlays")
                  (boolean :tag "No threshold" nil))
   :group 'anzu)
 
@@ -555,7 +561,12 @@
   (cl-loop for ov in (overlays-in beg end)
            when (overlay-get ov 'anzu-replace)
            collect ov into anzu-overlays
-           finally return (sort anzu-overlays 'anzu--overlay-sort)))
+           finally
+           return
+           (let ((sorted (sort anzu-overlays 'anzu--overlay-sort)))
+             (if anzu-replace-threshold
+                 (cl-subseq sorted 0 (min (length sorted) anzu-replace-threshold))
+               sorted))))
 
 (defsubst anzu--propertize-to-string (str)
   (let ((separator (or anzu-replace-to-string-separator "")))
