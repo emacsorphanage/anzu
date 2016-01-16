@@ -47,76 +47,62 @@
 
 (defcustom anzu-mode-lighter " Anzu"
   "Lighter of anzu-mode"
-  :type 'string
-  :group 'anzu)
+  :type 'string)
 
 (defcustom anzu-cons-mode-line-p t
   "Set nil if you use your own mode-line setting"
-  :type 'boolean
-  :group 'anzu)
+  :type 'boolean)
 
 (defcustom anzu-minimum-input-length 1
   "Minimum input length to enable anzu"
-  :type 'integer
-  :group 'anzu)
+  :type 'integer)
 
 (defcustom anzu-search-threshold nil
   "Limit of search number"
   :type '(choice (integer :tag "Threshold of search")
-                 (boolean :tag "No threshold" nil))
-  :group 'anzu)
+                 (boolean :tag "No threshold" nil)))
 
 (defcustom anzu-replace-threshold nil
   "Limit of replacement overlays."
   :type '(choice (integer :tag "Threshold of replacement overlays")
-                 (boolean :tag "No threshold" nil))
-  :group 'anzu)
+                 (boolean :tag "No threshold" nil)))
 
 (defcustom anzu-use-migemo nil
   "Flag of using migemo"
-  :type 'boolean
-  :group 'anzu)
+  :type 'boolean)
 
-(defcustom anzu-mode-line-update-function nil
+(defcustom anzu-mode-line-update-function #'anzu--update-mode-line-default
   "Function which return mode-line string"
-  :type 'function
-  :group 'anzu)
+  :type 'function)
 
 (defcustom anzu-regexp-search-commands '(isearch-forward-regexp
                                          isearch-backward-regexp)
   "Search function which use regexp."
-  :type '(repeat function)
-  :group 'anzu)
+  :type '(repeat function))
 
 (defcustom anzu-input-idle-delay 0.05
   "Idle second for updating modeline at replace commands"
-  :type 'number
-  :group 'anzu)
+  :type 'number)
 
 (defcustom anzu-deactivate-region nil
   "Deactive region if you use anzu a replace command with region"
-  :type 'boolean
-  :group 'anzu)
+  :type 'boolean)
 
 (defcustom anzu-replace-at-cursor-thing 'defun
   "Replace thing. This parameter is same as `thing-at-point'"
-  :type 'symbol
-  :group 'anzu)
+  :type 'symbol)
 
 (defcustom anzu-replace-to-string-separator ""
   "Separator of `to' string"
-  :type 'string
-  :group 'anzu)
+  :type 'string)
 
 (defface anzu-mode-line
   '((t (:foreground "magenta" :weight bold)))
-  "face of anzu modeline"
-  :group 'anzu)
+  "face of anzu modeline")
 
 (defface anzu-replace-highlight
   '((t :inherit query-replace))
-  "highlight of replaced string"
-  :group 'anzu)
+  "highlight of replaced string")
 
 (defface anzu-match-1
   '((((class color) (background light))
@@ -124,8 +110,7 @@
     (((class color) (background dark))
      :background "limegreen" :foreground "black")
     (t :inverse-video t))
-  "First group of match."
-  :group 'anzu)
+  "First group of match.")
 
 (defface anzu-match-2
   '((((class color) (background light))
@@ -133,8 +118,7 @@
     (((class color) (background dark))
      :background "yellow" :foreground "black")
     (t :inverse-video t))
-  "Second group of match."
-  :group 'anzu)
+  "Second group of match.")
 
 (defface anzu-match-3
   '((((class color) (background light))
@@ -142,16 +126,14 @@
     (((class color) (background dark))
      :background "aquamarine" :foreground "black")
     (t :inverse-video t))
-  "Third group of match."
-  :group 'anzu)
+  "Third group of match.")
 
 (defface anzu-replace-to
   '((((class color) (background light))
      :foreground "red")
     (((class color) (background dark))
      :foreground "yellow"))
-  "highlight of replace string"
-  :group 'anzu)
+  "highlight of replace string")
 
 (defvar anzu--total-matched 0)
 (defvar anzu--current-position 0)
@@ -215,7 +197,7 @@
                                (lambda (word &optional bound noerror count)
                                  (ignore-errors
                                    (migemo-forward word bound noerror count)))
-                             're-search-forward))
+                             #'re-search-forward))
               (case-fold-search (anzu--case-fold-search input)))
           (while (and (not finish) (funcall search-func input nil t))
             (push (cons (match-beginning 0) (match-end 0)) positions)
@@ -301,14 +283,11 @@
       (propertize status 'face 'anzu-mode-line))))
 
 (defun anzu--update-mode-line ()
-  (let ((update-func (or anzu-mode-line-update-function
-                         'anzu--update-mode-line-default)))
-    (funcall update-func anzu--current-position anzu--total-matched)))
+  (funcall anzu-mode-line-update-function anzu--current-position anzu--total-matched))
 
 ;;;###autoload
 (define-minor-mode anzu-mode
   "minor-mode which display search information in mode-line."
-  :group      'anzu
   :init-value nil
   :global     nil
   :lighter    anzu-mode-lighter
@@ -328,8 +307,7 @@
     (anzu-mode +1)))
 
 ;;;###autoload
-(define-globalized-minor-mode global-anzu-mode anzu-mode anzu--turn-on
-  :group 'anzu)
+(define-globalized-minor-mode global-anzu-mode anzu-mode anzu--turn-on)
 
 (defsubst anzu--query-prompt-base (use-region use-regexp)
   (concat "Query replace"
@@ -416,7 +394,7 @@
             overlayed))))))
 
 (defun anzu--search-outside-visible (buf input beg end use-regexp)
-  (let ((searchfn (if use-regexp 're-search-forward 'search-forward)))
+  (let ((searchfn (if use-regexp #'re-search-forward #'search-forward)))
     (when (or (not use-regexp) (anzu--validate-regexp input))
       (with-selected-window (get-buffer-window buf)
         (goto-char beg)
@@ -729,7 +707,7 @@
   (save-excursion
     (goto-char beg)
     (cl-loop with curbuf = (current-buffer)
-             with search-func = (if use-regexp 're-search-forward 'search-forward)
+             with search-func = (if use-regexp #'re-search-forward #'search-forward)
              while (funcall search-func from end t)
              do
              (progn
@@ -776,10 +754,10 @@
                 clear-overlay t)
           (let ((case-fold-search (not at-cursor)))
             (if use-regexp
-                (apply 'perform-replace (anzu--construct-perform-replace-arguments
-                                         from to delimited beg end backward query))
-              (apply 'query-replace (anzu--construct-query-replace-arguments
-                                     from to delimited beg end backward)))))
+                (apply #'perform-replace (anzu--construct-perform-replace-arguments
+                                          from to delimited beg end backward query))
+              (apply #'query-replace (anzu--construct-query-replace-arguments
+                                      from to delimited beg end backward)))))
       (progn
         (unless clear-overlay
           (anzu--clear-overlays curbuf beg end))
