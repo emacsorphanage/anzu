@@ -71,7 +71,7 @@
   "Flag of using migemo"
   :type 'boolean)
 
-(defcustom anzu-mode-line-update-function nil
+(defcustom anzu-mode-line-update-function #'anzu--update-mode-line-default
   "Function which return mode-line string"
   :type 'function)
 
@@ -283,9 +283,7 @@
       (propertize status 'face 'anzu-mode-line))))
 
 (defun anzu--update-mode-line ()
-  (let ((update-func (or anzu-mode-line-update-function
-                         'anzu--update-mode-line-default)))
-    (funcall update-func anzu--current-position anzu--total-matched)))
+  (funcall anzu-mode-line-update-function anzu--current-position anzu--total-matched))
 
 ;;;###autoload
 (define-minor-mode anzu-mode
