@@ -197,7 +197,7 @@
                                (lambda (word &optional bound noerror count)
                                  (ignore-errors
                                    (migemo-forward word bound noerror count)))
-                             're-search-forward))
+                             #'re-search-forward))
               (case-fold-search (anzu--case-fold-search input)))
           (while (and (not finish) (funcall search-func input nil t))
             (push (cons (match-beginning 0) (match-end 0)) positions)
@@ -394,7 +394,7 @@
             overlayed))))))
 
 (defun anzu--search-outside-visible (buf input beg end use-regexp)
-  (let ((searchfn (if use-regexp 're-search-forward 'search-forward)))
+  (let ((searchfn (if use-regexp #'re-search-forward #'search-forward)))
     (when (or (not use-regexp) (anzu--validate-regexp input))
       (with-selected-window (get-buffer-window buf)
         (goto-char beg)
@@ -707,7 +707,7 @@
   (save-excursion
     (goto-char beg)
     (cl-loop with curbuf = (current-buffer)
-             with search-func = (if use-regexp 're-search-forward 'search-forward)
+             with search-func = (if use-regexp #'re-search-forward #'search-forward)
              while (funcall search-func from end t)
              do
              (progn
@@ -754,10 +754,10 @@
                 clear-overlay t)
           (let ((case-fold-search (not at-cursor)))
             (if use-regexp
-                (apply 'perform-replace (anzu--construct-perform-replace-arguments
-                                         from to delimited beg end backward query))
-              (apply 'query-replace (anzu--construct-query-replace-arguments
-                                     from to delimited beg end backward)))))
+                (apply #'perform-replace (anzu--construct-perform-replace-arguments
+                                          from to delimited beg end backward query))
+              (apply #'query-replace (anzu--construct-query-replace-arguments
+                                      from to delimited beg end backward)))))
       (progn
         (unless clear-overlay
           (anzu--clear-overlays curbuf beg end))
