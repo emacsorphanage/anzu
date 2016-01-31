@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.60 2016/01/31 syohex
+   - Add replacement threshold(#66)
+   - Refactoring code
+
 Revision 0.59 2015/10/15 syohex
    - Fix replacement around region issue(#63 Thanks akicho8)
 
