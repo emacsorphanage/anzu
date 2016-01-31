@@ -72,7 +72,7 @@
   :type 'boolean)
 
 (defcustom anzu-mode-line-update-function #'anzu--update-mode-line-default
-  "Function which return mode-line string"
+  "Function which return mode-line string. This must be non-nil."
   :type 'function)
 
 (defcustom anzu-regexp-search-commands '(isearch-forward-regexp
