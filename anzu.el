@@ -315,9 +315,9 @@
           (if use-regexp " regexp" "")
           (if use-region " in region" ""))  )
 
-(defun anzu--query-prompt (use-region use-regexp at-cursor)
+(defun anzu--query-prompt (use-region use-regexp at-cursor isearch-p)
   (let ((prompt (anzu--query-prompt-base use-region use-regexp)))
-    (if (and anzu--query-defaults (not at-cursor))
+    (if (and anzu--query-defaults (not at-cursor) (not isearch-p))
         (format "%s (default %s -> %s) "
                 prompt
                 (query-replace-descr (caar anzu--query-defaults))
@@ -634,6 +634,13 @@
       (force-mode-line-update)
       symbol-regexp)))
 
+(defun anzu--query-from-isearch-string (buf beg end use-regexp overlay-limit)
+  (anzu--count-and-highlight-matched buf isearch-string beg end use-regexp overlay-limit t)
+  (setq anzu--total-matched anzu--cached-count)
+  (force-mode-line-update)
+  (add-to-history query-replace-from-history-variable isearch-string nil t)
+  isearch-string)
+
 (defun anzu--thing-begin (thing)
   (let ((bound (bounds-of-thing-at-point thing)))
     (if bound
@@ -717,7 +724,8 @@
                      (cl-return nil)
                    (forward-char 1)))))))
 
-(cl-defun anzu--query-replace-common (use-regexp &key at-cursor thing prefix-arg (query t))
+(cl-defun anzu--query-replace-common (use-regexp
+                                      &key at-cursor thing prefix-arg (query t) isearch-p)
   (anzu--cons-mode-line 'replace-query)
   (let* ((use-region (use-region-p))
          (orig-point (point))
@@ -725,18 +733,21 @@
          (overlay-limit (anzu--overlay-limit))
          (beg (anzu--region-begin use-region (anzu--begin-thing at-cursor thing) backward))
          (end (anzu--region-end use-region thing))
-         (prompt (anzu--query-prompt use-region use-regexp at-cursor))
+         (prompt (anzu--query-prompt use-region use-regexp at-cursor isearch-p))
          (delimited (and current-prefix-arg (not (eq current-prefix-arg '-))))
          (curbuf (current-buffer))
          (clear-overlay nil))
     (when (and anzu-deactivate-region use-region)
       (deactivate-mark t))
     (unwind-protect
-        (let* ((from (if (and at-cursor beg)
-                         (progn
-                           (setq delimited nil)
-                           (anzu--query-from-at-cursor curbuf beg end overlay-limit))
-                       (anzu--query-from-string prompt beg end use-regexp overlay-limit)))
+        (let* ((from (cond ((and at-cursor beg)
+                            (setq delimited nil)
+                            (anzu--query-from-at-cursor curbuf beg end overlay-limit))
+                           (isearch-p
+                            (anzu--query-from-isearch-string
+                             curbuf beg end use-regexp overlay-limit))
+                           (t (anzu--query-from-string
+                               prompt beg end use-regexp overlay-limit))))
                (to (cond ((consp from)
                           (prog1 (cdr from)
                             (setq from (car from)
@@ -797,6 +808,32 @@
                                 :query nil)
     (goto-char (marker-position orig))
     (set-marker orig nil)))
+
+(defun anzu--isearch-query-replace-common (use-regexp arg)
+  (isearch-done nil t)
+  (isearch-clean-overlays)
+  (let ((isearch-recursive-edit nil)
+        (backward (< (prefix-numeric-value arg) 0)))
+    (when (and isearch-other-end
+               (if backward
+                   (> isearch-other-end (point))
+                 (< isearch-other-end (point)))
+               (not (and transient-mark-mode mark-active
+                         (if backward
+                             (> (mark) (point))
+                           (< (mark) (point))))))
+      (goto-char isearch-other-end))
+    (anzu--query-replace-common use-regexp :prefix-arg arg :isearch-p t)))
+
+;;;###autoload
+(defun anzu-isearch-query-replace (arg)
+  (interactive "p")
+  (anzu--isearch-query-replace-common nil arg))
+
+;;;###autoload
+(defun anzu-isearch-query-replace-regexp (arg)
+  (interactive "p")
+  (anzu--isearch-query-replace-common t arg))
 
 (provide 'anzu)
 ;;; anzu.el ends here
