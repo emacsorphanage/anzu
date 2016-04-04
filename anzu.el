@@ -624,8 +624,13 @@
     (forward-line 1)
     (point)))
 
-(defun anzu--query-from-at-cursor (buf beg end overlay-limit)
-  (let ((symbol (thing-at-point 'symbol)))
+(defun anzu--query-from-at-cursor (buf beg end overlay-limit use-region)
+  (let ((symbol (save-excursion
+                  (when use-region
+                    (let ((orig (bound-and-true-p evil-visual-point)))
+                      (when orig
+                        (goto-char orig))))
+                  (thing-at-point 'symbol))))
     (unless symbol
       (error "No symbol at cursor!!"))
     (let ((symbol-regexp (concat "\\_<" (regexp-quote symbol) "\\_>")))
@@ -735,7 +740,7 @@
         (let* ((from (if (and at-cursor beg)
                          (progn
                            (setq delimited nil)
-                           (anzu--query-from-at-cursor curbuf beg end overlay-limit))
+                           (anzu--query-from-at-cursor curbuf beg end overlay-limit use-region))
                        (anzu--query-from-string prompt beg end use-regexp overlay-limit)))
                (to (cond ((consp from)
                           (prog1 (cdr from)
