@@ -5,4 +5,5 @@
 
 (development
  (depends-on "powerline")
+ (depends-on "evil")
  (depends-on "migemo"))
