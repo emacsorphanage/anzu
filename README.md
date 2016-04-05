@@ -211,8 +211,8 @@ Separator of `to` string.
  '(anzu-replace-threshold 50)
  '(anzu-replace-to-string-separator " => "))
 
-(define-key isearch-mode-map (kbd "M-%") #'anzu-isearch-query-replace)
-(define-key isearch-mode-map (kbd "C-M-%") #'anzu-isearch-query-replace-regexp)
+(define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
+(define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
 ```
 
 [melpa-link]: https://melpa.org/#/anzu
