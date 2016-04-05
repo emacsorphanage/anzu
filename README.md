@@ -82,6 +82,14 @@ in the function.
 ![anzu-replace-demo](image/anzu-replace-demo-noquery.gif)
 
 
+#### `anzu-isearch-query-replace`
+
+Anzu version of `isearch-query-replace`
+
+#### `anzu-isearch-query-replace-regexp`
+
+Anzu version of `isearch-query-replace-regexp`
+
 ## Customization
 
 #### `anzu-mode-line`
@@ -202,6 +210,9 @@ Separator of `to` string.
  '(anzu-search-threshold 1000)
  '(anzu-replace-threshold 50)
  '(anzu-replace-to-string-separator " => "))
+
+(define-key isearch-mode-map (kbd "M-%") #'anzu-isearch-query-replace)
+(define-key isearch-mode-map (kbd "C-M-%") #'anzu-isearch-query-replace-regexp)
 ```
 
 [melpa-link]: https://melpa.org/#/anzu
