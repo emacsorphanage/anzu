@@ -57,8 +57,8 @@ Same as `query-replace-regexp` except anzu information in mode-line
 Add following S-exp in your configuration if you want to use anzu's replace commands by default.
 
 ```lisp
-(global-set-key (kbd "M-%") 'anzu-query-replace)
-(global-set-key (kbd "C-M-%") 'anzu-query-replace-regexp)
+(global-set-key [remap query-replace] 'anzu-query-replace)
+(global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
 ```
 
 [anzu-replace-demo](image/anzu-replace-demo.gif)
