@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.61 2016/06/17 syohex
+   - Don't overwrite user's case-fold-search(#75)
+   - Implement anzu's isearch-query-replace commands(#72)
+
 Revision 0.60 2016/01/31 syohex
    - Add replacement threshold(#66)
    - Refactoring code
