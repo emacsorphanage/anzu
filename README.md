@@ -29,7 +29,7 @@ You can install `anzu.el` from [MELPA](https://melpa.org/) with `package.el`
 
 ## Basic Usage
 
-#### `global-anzu-mode`
+##### `global-anzu-mode`
 
 Enable global anzu mode:
 
@@ -37,7 +37,7 @@ Enable global anzu mode:
 (global-anzu-mode +1)
 ```
 
-#### `anzu-mode`
+##### `anzu-mode`
 
 Enable anzu minor mode:
 
@@ -45,11 +45,11 @@ Enable anzu minor mode:
 (anzu-mode +1)
 ```
 
-#### `anzu-query-replace`
+##### `anzu-query-replace`
 
 Same as `query-replace` except anzu information in mode-line
 
-#### `anzu-query-replace-regexp`
+##### `anzu-query-replace-regexp`
 
 Same as `query-replace-regexp` except anzu information in mode-line
 
@@ -64,16 +64,16 @@ Add following S-exp in your configuration if you want to use anzu's replace comm
 [anzu-replace-demo](image/anzu-replace-demo.gif)
 
 
-#### `anzu-query-replace-at-cursor`
+##### `anzu-query-replace-at-cursor`
 
 Same as `anzu-query-replace` except *from-string* is symbol at cursor
 
-#### `anzu-query-replace-at-cursor-thing`
+##### `anzu-query-replace-at-cursor-thing`
 
 Same as `anzu-query-replace-at-cursor` except replaced region is
 specified by `anzu-replace-at-cursor-thing`.
 
-#### `anzu-replace-at-cursor-thing`
+##### `anzu-replace-at-cursor-thing`
 
 Same as `anzu-query-replace-at-cursor-thing` except not query.
 This command is useful in refactoring such as changing variable name
@@ -82,29 +82,29 @@ in the function.
 ![anzu-replace-demo](image/anzu-replace-demo-noquery.gif)
 
 
-#### `anzu-isearch-query-replace`
+##### `anzu-isearch-query-replace`
 
 Anzu version of `isearch-query-replace`
 
-#### `anzu-isearch-query-replace-regexp`
+##### `anzu-isearch-query-replace-regexp`
 
 Anzu version of `isearch-query-replace-regexp`
 
 ## Customization
 
-#### `anzu-mode-line`
+##### `anzu-mode-line`
 
 Face of mode-line anzu information
 
-#### `anzu-replace-highlight`
+##### `anzu-replace-highlight`
 
 Face of from-string of replacement
 
-#### `anzu-replace-to`
+##### `anzu-replace-to`
 
 Face of to-string of replacement
 
-#### `anzu-mode-line-update-function`
+##### `anzu-mode-line-update-function`
 
 Function which constructs mode-line string. anzu.el puts its output to mode-line. It is called at searching, inputting replaced word, replacing. This must be non-nil.
 
@@ -123,7 +123,7 @@ The function takes 2 integer arguments, current position and total match number.
  '(anzu-mode-line-update-function #'my/anzu-update-func))
 ```
 
-#### `anzu-cons-mode-line-p`(Default is `t`)
+##### `anzu-cons-mode-line-p`(Default is `t`)
 
 Set `nil` if you want to display anzu information at any position in mode-line.
 `anzu.el` cons search information head of `mode-line` as default.
@@ -141,27 +141,27 @@ For example, show search information tail of `minor-mode-alist`
 ![anzu-any-position](image/anzu-any-position.png)
 
 
-#### `anzu-mode-lighter`
+##### `anzu-mode-lighter`
 
 Mode name in `mode-line`. Default is ` Anzu`.
 
 
-#### `anzu-input-idle-delay`(Default is `0.05`)
+##### `anzu-input-idle-delay`(Default is `0.05`)
 
 Delay second of updating mode-line information when you input from-string
 
-#### `anzu-regexp-search-commands`
+##### `anzu-regexp-search-commands`
 
 Commands which have regexp input. If the last command is a member of this list,
 `anzu.el` treats input as regular expression.
 
 The default value is `'(isearch-forward-regexp isearch-backward-regexp)`.
 
-#### `anzu-use-migemo`(Default is `nil`)
+##### `anzu-use-migemo`(Default is `nil`)
 
 Set to `t` if you use [migemo](https://github.com/emacs-jp/migemo).
 
-#### `anzu-search-threshold`(Default is `nil`)
+##### `anzu-search-threshold`(Default is `nil`)
 
 Threshold of searched words. If there are searched word more than this value,
 `anzu.el` stops to search and display total number like `1000+`(as default).
@@ -169,28 +169,28 @@ If this value is `nil`, `anzu.el` counts all words.
 
 ![anzu-threshold](image/anzu-threshold.png)
 
-#### `anzu-replace-threshold`(Default is `nil`)
+##### `anzu-replace-threshold`(Default is `nil`)
 
 Threshold of replacement overlay. If this value is `nil`,
 
-#### `anzu-minimum-input-length`(Default is 1)
+##### `anzu-minimum-input-length`(Default is 1)
 
 Minimum input length to enable anzu. This parameter is useful for `migemo` users.
 Searching 1 or 2 characters with `migemo` is too heavy if buffer is so large.
 Please set 3 or higher if you frequently edit such file.
 
-#### `anzu-deactivate-region`(Default is `nil`)
+##### `anzu-deactivate-region`(Default is `nil`)
 
 Deactivate region at anzu replace command if this value is non-nil.
 It is hard to see with anzu replace command when region is active.
 
 
-#### `anzu-replace-at-cursor-thing`(Default is 'defun)
+##### `anzu-replace-at-cursor-thing`(Default is 'defun)
 
 Thing at point of `anzu-query-replace-at-cursor-thing`.
 This parameter is same as `thing-at-point`.
 
-#### `anzu-replace-to-string-separator`(Default is "")
+##### `anzu-replace-to-string-separator`(Default is "")
 
 Separator of `to` string.
 
