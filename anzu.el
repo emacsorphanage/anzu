@@ -60,12 +60,12 @@
 (defcustom anzu-search-threshold nil
   "Limit of search number"
   :type '(choice (integer :tag "Threshold of search")
-                 (boolean :tag "No threshold" nil)))
+                 (const :tag "No threshold" nil)))
 
 (defcustom anzu-replace-threshold nil
   "Limit of replacement overlays."
   :type '(choice (integer :tag "Threshold of replacement overlays")
-                 (boolean :tag "No threshold" nil)))
+                 (const :tag "No threshold" nil)))
 
 (defcustom anzu-use-migemo nil
   "Flag of using migemo"
