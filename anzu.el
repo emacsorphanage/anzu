@@ -408,7 +408,7 @@
 (defconst anzu--from-to-separator
   (propertize
    (or (ignore-errors
-	 (if (char-displayable-p ?\u2192) " \u2192 " " -> "))
+         (if (char-displayable-p ?\u2192) " \u2192 " " -> "))
        " -> ")
    'face 'minibuffer-prompt))
 
