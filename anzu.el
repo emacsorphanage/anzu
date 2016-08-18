@@ -169,8 +169,12 @@
   (and (not (memq anzu--last-command anzu-regexp-search-commands))
        (not isearch-regexp)))
 
+(defsubst anzu--isearch-regexp-function ()
+  (or (bound-and-true-p isearch-regexp-function)
+      (bound-and-true-p isearch-word)))
+
 (defun anzu--transform-input (str)
-  (cond ((eq isearch-word 'isearch-symbol-regexp)
+  (cond ((eq (anzu--isearch-regexp-function) 'isearch-symbol-regexp)
          (setq str (isearch-symbol-regexp str)))
         ((anzu--word-search-p)
          (setq str (regexp-quote str)))
@@ -221,7 +225,7 @@
            finally return 0))
 
 (defun anzu--use-result-cache-p (input)
-  (and (eq isearch-word (car anzu--last-search-state))
+  (and (eq (anzu--isearch-regexp-function) (car anzu--last-search-state))
        (eq isearch-regexp (cdr anzu--last-search-state))
        (string= input anzu--last-isearch-string)))
 
@@ -234,7 +238,7 @@
         (setq anzu--total-matched (plist-get result :count)
               anzu--overflow-p (plist-get result :overflow)
               anzu--current-position curpos
-              anzu--last-search-state (cons isearch-word isearch-regexp)
+              anzu--last-search-state (cons (anzu--isearch-regexp-function) isearch-regexp)
               anzu--last-isearch-string query)
         (force-mode-line-update)))))
 
