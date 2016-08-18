@@ -841,4 +841,7 @@
   (anzu--isearch-query-replace-common t arg))
 
 (provide 'anzu)
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
 ;;; anzu.el ends here
