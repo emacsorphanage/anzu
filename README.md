@@ -61,7 +61,7 @@ Add following S-exp in your configuration if you want to use anzu's replace comm
 (global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
 ```
 
-[anzu-replace-demo](image/anzu-replace-demo.gif)
+![anzu-replace-demo](image/anzu-replace-demo.gif)
 
 
 ##### `anzu-query-replace-at-cursor`
