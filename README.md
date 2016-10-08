@@ -9,7 +9,7 @@ information in the mode-line in various search modes.
 
 ## Screenshot
 
-![anzu.gif](image/anzu.gif)
+![Screencast of anzu.gif](image/anzu.gif)
 
 
 ## Requirements
@@ -61,7 +61,7 @@ Add following S-exp in your configuration if you want to use anzu's replace comm
 (global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
 ```
 
-[anzu-replace-demo](image/anzu-replace-demo.gif)
+[Screencast of anzu-query-replace-at-cursor-thing](image/anzu-replace-demo.gif)
 
 
 ##### `anzu-query-replace-at-cursor`
@@ -79,7 +79,7 @@ Same as `anzu-query-replace-at-cursor-thing` except not query.
 This command is useful in refactoring such as changing variable name
 in the function.
 
-![anzu-replace-demo](image/anzu-replace-demo-noquery.gif)
+![Screencast of anzu-replace-at-cursor-thing](image/anzu-replace-demo-noquery.gif)
 
 
 ##### `anzu-isearch-query-replace`
