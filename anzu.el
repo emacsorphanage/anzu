@@ -5,7 +5,7 @@
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; URL: https://github.com/syohex/emacs-anzu
 ;; Version: 0.62
-;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
+;; Package-Requires: ((emacs "24.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -298,7 +298,7 @@
   :lighter    anzu-mode-lighter
   (if anzu-mode
       (progn
-        (set (make-local-variable 'anzu--state) nil)
+        (setq-local anzu--state nil)
         (add-hook 'isearch-update-post-hook #'anzu--update-post-hook nil t)
         (add-hook 'isearch-mode-hook #'anzu--cons-mode-line-search nil t)
         (add-hook 'isearch-mode-end-hook #'anzu--reset-mode-line nil t))
