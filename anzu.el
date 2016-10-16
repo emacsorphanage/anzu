@@ -789,26 +789,31 @@
 
 ;;;###autoload
 (defun anzu-query-replace-at-cursor ()
+  "Replace symbol at cursor with to-string."
   (interactive)
   (anzu--query-replace-common t :at-cursor t))
 
 ;;;###autoload
 (defun anzu-query-replace-at-cursor-thing ()
+  "Replace symbol at cursor within `anzu-replace-at-cursor-thing' area."
   (interactive)
   (anzu--query-replace-common t :at-cursor t :thing anzu-replace-at-cursor-thing))
 
 ;;;###autoload
 (defun anzu-query-replace (arg)
+  "anzu version of `query-replace'."
   (interactive "p")
   (anzu--query-replace-common nil :prefix-arg arg))
 
 ;;;###autoload
 (defun anzu-query-replace-regexp (arg)
+  "anzu version of `query-replace-regexp'."
   (interactive "p")
   (anzu--query-replace-common t :prefix-arg arg))
 
 ;;;###autoload
 (defun anzu-replace-at-cursor-thing ()
+  "anzu-query-replace-at-cursor-thing without query."
   (interactive)
   (let ((orig (point-marker)))
     (anzu--query-replace-common t
@@ -836,11 +841,13 @@
 
 ;;;###autoload
 (defun anzu-isearch-query-replace (arg)
+  "anzu version of `isearch-query-replace'."
   (interactive "p")
   (anzu--isearch-query-replace-common nil arg))
 
 ;;;###autoload
 (defun anzu-isearch-query-replace-regexp (arg)
+  "anzu version of `isearch-query-replace-regexp'."
   (interactive "p")
   (anzu--isearch-query-replace-common t arg))
 
