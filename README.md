@@ -96,6 +96,10 @@ Anzu version of `isearch-query-replace-regexp`
 
 Face of mode-line anzu information
 
+##### `anzu-mode-line-no-match`
+
+Face of mode-line at no matching case
+
 ##### `anzu-replace-highlight`
 
 Face of from-string of replacement
