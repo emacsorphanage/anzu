@@ -100,6 +100,10 @@
   '((t (:foreground "magenta" :weight bold)))
   "face of anzu modeline")
 
+(defface anzu-mode-line-no-match
+  '((t (:inherit anzu-mode-line)))
+  "face of anzu modeline in no match case")
+
 (defface anzu-replace-highlight
   '((t :inherit query-replace))
   "highlight of replaced string")
@@ -284,8 +288,11 @@
                                     (anzu--format-here-position here total)
                                     total (if anzu--overflow-p "+" "")))
                     (replace-query (format "(%d replace)" total))
-                    (replace (format "(%d/%d)" here total)))))
-      (propertize status 'face 'anzu-mode-line))))
+                    (replace (format "(%d/%d)" here total))))
+          (face (if (and (zerop total) (not (string= isearch-string "")))
+                    'anzu-mode-line-no-match
+                  'anzu-mode-line)))
+      (propertize status 'face face))))
 
 (defun anzu--update-mode-line ()
   (funcall anzu-mode-line-update-function anzu--current-position anzu--total-matched))
