@@ -222,11 +222,16 @@
             result))))))
 
 (defun anzu--where-is-here (positions here)
-  (cl-loop for (start . end) in positions
-           for i = 1 then (1+ i)
-           when (and (>= here start) (<= here end))
-           return i
-           finally return 0))
+  ;; don't use loop for emacs 27 bug
+  (let ((poss positions)
+        (index 1)
+        (ret 0))
+    (while poss
+      (let ((pos (car poss)))
+        (if (and (>= here (car pos)) (<= here (cdr pos)))
+            (setq ret index poss nil)
+          (setq poss (cdr poss) index (1+ index)))))
+    ret))
 
 (defun anzu--use-result-cache-p (input)
   (and (eq (anzu--isearch-regexp-function) (car anzu--last-search-state))
