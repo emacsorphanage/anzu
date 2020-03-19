@@ -774,8 +774,11 @@
                             (setq from (car from)
                                   anzu--total-matched anzu--last-replaced-count)))
                          ((string-match "\0" from)
-                          (prog1 (substring-no-properties from (match-end 0))
-                            (setq from (substring-no-properties from 0 (match-beginning 0)))))
+                          (let ((replaced (substring-no-properties from (match-end 0))))
+                            (setq from (substring-no-properties from 0 (match-beginning 0)))
+                            (if use-regexp
+                                (anzu--compile-replace-text replaced)
+                              replaced)))
                          (t
                           (anzu--query-replace-read-to
                            from prompt beg end use-regexp overlay-limit)))))
