@@ -165,7 +165,7 @@
   (list :count count :overflow overflow :positions positions))
 
 (defsubst anzu--case-fold-search (input)
-  (when case-fold-search
+  (when isearch-case-fold-search
     (let ((case-fold-search nil))
       (not (string-match-p "[A-Z]" input)))))
 
