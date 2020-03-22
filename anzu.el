@@ -380,7 +380,7 @@
 
 ;; Return highlighted count
 (defun anzu--count-and-highlight-matched (buf str replace-beg replace-end
-                                          use-regexp overlay-limit case-sensitive)
+                                              use-regexp overlay-limit case-sensitive)
   (anzu--cleanup-markers)
   (when (not use-regexp)
     (setq str (regexp-quote str)))
@@ -870,5 +870,6 @@
 (provide 'anzu)
 ;; Local Variables:
 ;; indent-tabs-mode: nil
+;; fill-column: 85
 ;; End:
 ;;; anzu.el ends here
