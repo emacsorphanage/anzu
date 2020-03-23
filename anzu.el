@@ -40,8 +40,6 @@
 (require 'cl-lib)
 (require 'thingatpt)
 
-(declare-function migemo-forward 'migemo)
-
 (defgroup anzu nil
   "Show searched position in mode-line"
   :group 'isearch)
@@ -205,7 +203,7 @@
               (finish nil)
               (search-func (if (anzu--use-migemo-p)
                                (lambda (word &optional bound noerror count)
-                                 (ignore-errors
+                                 (with-no-warnings
                                    (migemo-forward word bound noerror count)))
                              #'re-search-forward))
               (case-fold-search (anzu--case-fold-search input)))
@@ -868,8 +866,10 @@
   (anzu--isearch-query-replace-common t arg))
 
 (provide 'anzu)
+
 ;; Local Variables:
 ;; indent-tabs-mode: nil
 ;; fill-column: 85
 ;; End:
+
 ;;; anzu.el ends here
