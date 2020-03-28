@@ -1,4 +1,8 @@
-# anzu.el [![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
+# anzu.el
+
+[![melpa badge][melpa-badge]][melpa-link]
+[![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
+[![circleci badge][circleci-badge]][circleci-link]
 
 ## Introduction
 
@@ -6,6 +10,16 @@
 `anzu.el` provides a minor mode which displays *current match* and *total matches*
 information in the mode-line in various search modes.
 
+## New Maintainer
+
+This package has a new maintainer as of March 2020, and based on the
+valuable contribution of insights and fixes from the author, you
+should see issues from years past are now getting resolved.  You may
+also see instability in the short term.  Please bear with us.  Note
+that we have a tag on version 0.62 (dated August 2016) which was the
+last version published before a period of dormancy.  You can get that
+version from MELPA stable if for any reason the recent changes aren't
+working for you.
 
 ## Screenshot
 
@@ -221,5 +235,7 @@ Separator of `to` string.
 
 [melpa-link]: https://melpa.org/#/anzu
 [melpa-stable-link]: https://stable.melpa.org/#/anzu
+[circleci-link]: https://app.circleci.com/pipelines/github/emacsorphanage/anzu
 [melpa-badge]: https://melpa.org/packages/anzu-badge.svg
 [melpa-stable-badge]: https://stable.melpa.org/packages/anzu-badge.svg
+[circleci-badge]: https://img.shields.io/circleci/project/github/emacsorphanage/anzu.svg
