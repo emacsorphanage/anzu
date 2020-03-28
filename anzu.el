@@ -163,10 +163,10 @@
 (defsubst anzu--construct-position-info (count overflow positions)
   (list :count count :overflow overflow :positions positions))
 
-(defsubst anzu--case-fold-search ()
-  (if isearch-mode
-      isearch-case-fold-search
-    case-fold-search))
+(defsubst anzu--case-fold-search (input)
+  (when isearch-case-fold-search
+    (let ((case-fold-search nil))
+      (not (string-match-p "[A-Z]" input)))))
 
 (defsubst anzu--word-search-p ()
   (and (not (memq anzu--last-command anzu-regexp-search-commands))
@@ -206,7 +206,7 @@
                                  (with-no-warnings
                                    (migemo-forward word bound noerror count)))
                              #'re-search-forward))
-              (case-fold-search (anzu--case-fold-search)))
+              (case-fold-search (anzu--case-fold-search input)))
           (while (and (not finish) (funcall search-func input nil t))
             (push (cons (match-beginning 0) (match-end 0)) positions)
             (cl-incf count)
@@ -235,8 +235,7 @@
 (defun anzu--use-result-cache-p (input)
   (and (eq (anzu--isearch-regexp-function) (car anzu--last-search-state))
        (eq isearch-regexp (cdr anzu--last-search-state))
-       (string= input anzu--last-isearch-string)
-       (not (eq last-command 'isearch-toggle-case-fold))))
+       (string= input anzu--last-isearch-string)))
 
 (defun anzu--update (query)
   (when (>= (length query) anzu-minimum-input-length)
@@ -586,7 +585,7 @@
     (unless (string= content anzu--last-replace-input)
       (setq anzu--last-replace-input content)
       (with-current-buffer buf
-        (let ((case-fold-search (anzu--case-fold-search)))
+        (let ((case-fold-search (anzu--case-fold-search from)))
           (dolist (ov (anzu--overlays-in-range beg (min end overlay-limit)))
             (let ((replace-evaled
                    (if (not use-regexp)
