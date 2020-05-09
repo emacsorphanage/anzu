@@ -97,7 +97,7 @@ function (see below).
 
 ##### `anzu-replace-at-cursor-thing`
 
-Like `anzu-query-replace-at-cursor-thing`, but doesn't for
+Like `anzu-query-replace-at-cursor-thing`, but doesn't query for
 confirmation before making the substitution.
 
 Be careful not to confuse this function with the identically named
