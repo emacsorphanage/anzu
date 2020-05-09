@@ -57,48 +57,58 @@ Enable anzu minor mode:
 
 ##### `anzu-query-replace`
 
-Same as `query-replace` except anzu information in mode-line
+Same as `query-replace` except displays anzu information in the
+mode-line.
 
 ##### `anzu-query-replace-regexp`
 
-Same as `query-replace-regexp` except anzu information in mode-line
+Same as `query-replace-regexp` except displays anzu information in the
+mode-line.
 
+![Screencast of anzu-query-replace-regexp](image/anzu-replace-demo.gif)
 
-Add following S-exp in your configuration if you want to use anzu's replace commands by default.
+You can replace key bindings for the standard definitions of
+`query-replace` and `query-replace-regexp` with their anzu versions by
+adding this snippet to your configuration:
 
 ```lisp
 (global-set-key [remap query-replace] 'anzu-query-replace)
 (global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
 ```
 
-[Screencast of anzu-query-replace-at-cursor-thing](image/anzu-replace-demo.gif)
-
-
 ##### `anzu-query-replace-at-cursor`
 
-Same as `anzu-query-replace` except *from-string* is symbol at cursor
+Works like `anzu-query-replace` except the *from-string* is the symbol
+at the cursor.
 
 ##### `anzu-query-replace-at-cursor-thing`
 
-Same as `anzu-query-replace-at-cursor` except replaced region is
-specified by `anzu-replace-at-cursor-thing`.
+Works like `anzu-query-replace-at-cursor` except the replacement is
+constrained to the region specified by the variable
+`anzu-replace-at-cursor-thing`.  See the variable's description in
+the customization section for additional details.
+
+Be careful not to confuse this variable with the identically named
+function (see below).
 
 ##### `anzu-replace-at-cursor-thing`
 
-Same as `anzu-query-replace-at-cursor-thing` except not query.
-This command is useful in refactoring such as changing variable name
-in the function.
+Like `anzu-query-replace-at-cursor-thing`, but doesn't query for
+confirmation before making the substitution.
+
+Be careful not to confuse this function with the identically named
+customization variable.  See the discussion in the
+`anzu-query-replace-at-cursor-thing` section.
 
 ![Screencast of anzu-replace-at-cursor-thing](image/anzu-replace-demo-noquery.gif)
 
-
 ##### `anzu-isearch-query-replace`
 
-Anzu version of `isearch-query-replace`
+The anzu version of `isearch-query-replace`.
 
 ##### `anzu-isearch-query-replace-regexp`
 
-Anzu version of `isearch-query-replace-regexp`
+The anzu version of `isearch-query-replace-regexp`.
 
 ## Customization
 
@@ -198,11 +208,13 @@ Please set 3 or higher if you frequently edit such file.
 Deactivate region at anzu replace command if this value is non-nil.
 It is hard to see with anzu replace command when region is active.
 
-
 ##### `anzu-replace-at-cursor-thing`(Default is 'defun)
 
-Thing at point of `anzu-query-replace-at-cursor-thing`.
-This parameter is same as `thing-at-point`.
+Describes the type of *thing* used by the `anzu-*-thing` functions.
+It can be set to any symbol that is a valid argument for the
+`thing-at-point` function, including e.g.  `defun`, `word`, and
+`page`.  See the documentation for `thing-at-point` for additional
+information.
 
 ##### `anzu-replace-to-string-separator`(Default is "")
 
