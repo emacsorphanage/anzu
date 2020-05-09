@@ -15,11 +15,7 @@ information in the mode-line in various search modes.
 This package has a new maintainer as of March 2020, and based on the
 valuable contribution of insights and fixes from the author, you
 should see issues from years past are now getting resolved.  You may
-also see instability in the short term.  Please bear with us.  Note
-that we have a tag on version 0.62 (dated August 2016) which was the
-last version published before a period of dormancy.  You can get that
-version from MELPA stable if for any reason the recent changes aren't
-working for you.
+also see instability in the short term.  Please bear with us!
 
 ## Screenshot
 
