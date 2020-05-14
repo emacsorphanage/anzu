@@ -56,12 +56,12 @@
   "Minimum input length to enable anzu"
   :type 'integer)
 
-(defcustom anzu-search-threshold nil
+(defcustom anzu-search-threshold 1000
   "Limit of search number"
   :type '(choice (integer :tag "Threshold of search")
                  (const :tag "No threshold" nil)))
 
-(defcustom anzu-replace-threshold nil
+(defcustom anzu-replace-threshold 1000
   "Limit of replacement overlays."
   :type '(choice (integer :tag "Threshold of replacement overlays")
                  (const :tag "No threshold" nil)))
