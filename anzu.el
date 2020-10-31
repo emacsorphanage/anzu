@@ -6,7 +6,7 @@
 ;; Maintainer: Neil Okamoto <neil.okamoto+melpa@gmail.com>
 ;; URL: https://github.com/emacsorphanage/anzu
 ;; Version: 0.62
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "25.1"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -152,6 +152,7 @@
 (defvar anzu--outside-point nil)
 (defvar anzu--history nil)
 (defvar anzu--query-defaults nil)
+(defvar anzu--region-noncontiguous nil)
 
 (defun anzu--validate-regexp (regexp)
   (condition-case nil
@@ -274,7 +275,8 @@
         anzu--state nil
         anzu--last-command nil
         anzu--last-isearch-string nil
-        anzu--overflow-p nil))
+        anzu--overflow-p nil
+        anzu--region-noncontiguous nil))
 
 (defun anzu--reset-mode-line ()
   (anzu--reset-status)
@@ -377,6 +379,14 @@
   (mapc (lambda (m) (set-marker m nil)) anzu--replaced-markers)
   (setq anzu--replaced-markers nil))
 
+(defun anzu2--put-overlay-p (beg end overlay-beg overlay-end)
+  (if anzu--region-noncontiguous
+      (cl-loop for (b . e) in (cl-loop for region in anzu--region-noncontiguous
+                                       when (and (>= (car region) overlay-beg) (<= (cdr region) overlay-end))
+                                       collect region)
+               thereis (and (>= beg b overlay-beg) (<= end e overlay-end)))
+    (and (>= beg overlay-beg) (<= end overlay-end))))
+
 ;; Return highlighted count
 (defun anzu--count-and-highlight-matched (buf str replace-beg replace-end
                                               use-regexp overlay-limit case-sensitive)
@@ -401,7 +411,11 @@
                                       nil
                                     (anzu--case-fold-search))))
             (while (and (not finish) (funcall search-func str replace-end t))
-              (cl-incf count)
+              (if anzu--region-noncontiguous
+                  (when (cl-loop for (b . e) in anzu--region-noncontiguous
+                                 thereis (and (>= (point) b) (<= (point) e)))
+                    (cl-incf count))
+                (cl-incf count))
               (let ((beg (match-beginning 0))
                     (end (match-end 0)))
                 (when (= beg end)
@@ -410,7 +424,7 @@
                     (forward-char step)))
                 (when (and replace-end (funcall cmp-func (point) replace-end))
                   (setq finish t))
-                (when (and (>= beg overlay-beg) (<= end overlay-end) (not finish))
+                (when (and (not finish) (anzu2--put-overlay-p beg end overlay-beg overlay-end))
                   (cl-incf overlayed)
                   (anzu--add-overlay beg end))))
             (setq anzu--cached-count count)
@@ -714,13 +728,13 @@
 
 (defun anzu--construct-perform-replace-arguments (from to delimited beg end backward query)
   (if backward
-      (list from to query t delimited nil nil beg end backward)
-    (list from to query t delimited nil nil beg end)))
+      (list from to query t delimited nil nil beg end backward anzu--region-noncontiguous)
+    (list from to query t delimited nil nil beg end nil anzu--region-noncontiguous)))
 
 (defun anzu--construct-query-replace-arguments (from to delimited beg end backward)
   (if backward
-      (list from to delimited beg end backward)
-    (list from to delimited beg end)))
+      (list from to delimited beg end backward anzu--region-noncontiguous)
+    (list from to delimited beg end nil anzu--region-noncontiguous)))
 
 (defsubst anzu--current-replaced-index (curpoint)
   (cl-loop for m in anzu--replaced-markers
@@ -759,6 +773,8 @@
 (cl-defun anzu--query-replace-common (use-regexp
                                       &key at-cursor thing prefix-arg (query t) isearch-p)
   (anzu--cons-mode-line 'replace-query)
+  (when (and (use-region-p) (region-noncontiguous-p))
+    (setq anzu--region-noncontiguous (funcall region-extract-function 'bounds)))
   (let* ((use-region (use-region-p))
          (orig-point (point))
          (backward (anzu--replace-backward-p prefix-arg))
