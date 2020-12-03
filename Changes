@@ -1,5 +1,9 @@
 Revision history for anzu.el
 
+Revision 0.64 2020/12/02 nokamoto
+   - default anzu-search-threshold and anzu-replace-threshold is 1000 (#113)
+   - support non-contiguous regions like rectangle region (#115)
+
 Revision 0.62 2016/08/18 syohex
    - Don't search over bounds(#80)
    - Correct variable type attribute(#76 Thanks Matus Goljer)
