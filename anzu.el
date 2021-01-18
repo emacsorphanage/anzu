@@ -5,7 +5,7 @@
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; Maintainer: Neil Okamoto <neil.okamoto+melpa@gmail.com>
 ;; URL: https://github.com/emacsorphanage/anzu
-;; Version: 0.62
+;; Version: 0.64
 ;; Package-Requires: ((emacs "25.1"))
 
 ;; This program is free software; you can redistribute it and/or modify
