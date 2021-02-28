@@ -600,7 +600,9 @@
 (defsubst anzu--replaced-literal-string (ov replaced from)
   (let ((str (buffer-substring-no-properties
               (overlay-start ov) (overlay-end ov))))
-    (when (string-match str from)
+    ;; Needed to do `(string-match from str)' instead of `(string-match str from)',
+    ;; because lax whitespace means `from' can be a regexp.
+    (when (string-match from str)
       (replace-match replaced (not case-fold-search) t str))))
 
 (defun anzu--append-replaced-string (content buf beg end use-regexp overlay-limit from)
