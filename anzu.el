@@ -390,10 +390,14 @@
 (defun anzu--convert-for-lax-whitespace (str use-regexp)
   (if use-regexp
       (if replace-regexp-lax-whitespace
-          (replace-regexp-in-string "\\s-+" "\\\\s-+" str)
+          (replace-regexp-in-string "\\s-+" search-whitespace-regexp str
+                                    nil t)
         str)
     (if replace-lax-whitespace
-        (replace-regexp-in-string "\\s-+" "\\\\s-+" (regexp-quote str))
+        (replace-regexp-in-string "\\s-+"
+                                  search-whitespace-regexp
+                                  (regexp-quote str)
+                                  nil t)
       (regexp-quote str))))
 
 ;; Return highlighted count
