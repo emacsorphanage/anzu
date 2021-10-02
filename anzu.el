@@ -387,12 +387,24 @@
                thereis (and (>= beg b overlay-beg) (<= end e overlay-end)))
     (and (>= beg overlay-beg) (<= end overlay-end))))
 
+(defun anzu--convert-for-lax-whitespace (str use-regexp)
+  (if use-regexp
+      (if replace-regexp-lax-whitespace
+          (replace-regexp-in-string "\\s-+" search-whitespace-regexp str
+                                    nil t)
+        str)
+    (if replace-lax-whitespace
+        (replace-regexp-in-string "\\s-+"
+                                  search-whitespace-regexp
+                                  (regexp-quote str)
+                                  nil t)
+      (regexp-quote str))))
+
 ;; Return highlighted count
 (defun anzu--count-and-highlight-matched (buf str replace-beg replace-end
                                               use-regexp overlay-limit case-sensitive)
   (anzu--cleanup-markers)
-  (when (not use-regexp)
-    (setq str (regexp-quote str)))
+  (setq str (anzu--convert-for-lax-whitespace str use-regexp))
   (if (not (anzu--validate-regexp str))
       anzu--cached-count
     (with-current-buffer buf
@@ -592,7 +604,9 @@
 (defsubst anzu--replaced-literal-string (ov replaced from)
   (let ((str (buffer-substring-no-properties
               (overlay-start ov) (overlay-end ov))))
-    (when (string-match (regexp-quote str) from)
+    ;; Needed to do `(string-match from str)' instead of `(string-match str from)',
+    ;; because lax whitespace means `from' can be a regexp.
+    (when (string-match from str)
       (replace-match replaced (not case-fold-search) t str))))
 
 (defun anzu--append-replaced-string (content buf beg end use-regexp overlay-limit from)
@@ -600,13 +614,14 @@
     (unless (string= content anzu--last-replace-input)
       (setq anzu--last-replace-input content)
       (with-current-buffer buf
-        (let ((case-fold-search (anzu--case-fold-search)))
+        (let ((case-fold-search (anzu--case-fold-search))
+              (pattern (anzu--convert-for-lax-whitespace from use-regexp)))
           (dolist (ov (anzu--overlays-in-range beg (min end overlay-limit)))
             (let ((replace-evaled
                    (if (not use-regexp)
-                       (anzu--replaced-literal-string ov content from)
+                       (anzu--replaced-literal-string ov content pattern)
                      (prog1 (anzu--evaluate-occurrence ov content replacements
-                                                       (not case-fold-search) from)
+                                                       (not case-fold-search) pattern)
                        (cl-incf replacements)))))
               (overlay-put ov 'after-string (anzu--propertize-to-string replace-evaled)))))))))
 
