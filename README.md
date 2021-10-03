@@ -2,7 +2,7 @@
 
 [![melpa badge][melpa-badge]][melpa-link]
 [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
-[![circleci badge][circleci-badge]][circleci-link]
+[![gh actions badge][gh-actions-badge]][gh-actions-link]
 
 ## Introduction
 
@@ -243,7 +243,7 @@ Separator of `to` string.
 
 [melpa-link]: https://melpa.org/#/anzu
 [melpa-stable-link]: https://stable.melpa.org/#/anzu
-[circleci-link]: https://app.circleci.com/pipelines/github/emacsorphanage/anzu
+[gh-actions-link]: https://github.com/emacsorphanage/anzu/actions
 [melpa-badge]: https://melpa.org/packages/anzu-badge.svg
 [melpa-stable-badge]: https://stable.melpa.org/packages/anzu-badge.svg
-[circleci-badge]: https://img.shields.io/circleci/project/github/emacsorphanage/anzu.svg
+[gh-actions-badge]: https://github.com/emacsorphanage/anzu/workflows/ci-checks/badge.svg
