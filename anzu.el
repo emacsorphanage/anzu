@@ -267,7 +267,7 @@
 
 (defun anzu--cons-mode-line (state)
   (setq anzu--state state)
-  (when (and anzu-cons-mode-line-p (not (anzu--mode-line-not-set-p)))
+  (when (and anzu-cons-mode-line-p (listp mode-line-format) (not (anzu--mode-line-not-set-p)))
     (setq mode-line-format (cons anzu--mode-line-format mode-line-format))))
 
 (defsubst anzu--reset-status ()
