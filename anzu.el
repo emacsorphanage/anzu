@@ -27,7 +27,7 @@
 ;;
 ;; `anzu.el' provides a minor mode which displays the match count for
 ;; various search commands in the mode-line, using the format
-;; `current/total'. This makes it easy to know how many matches your
+;; `current/total'.  This makes it easy to know how many matches your
 ;; search query has in the current buffer.
 
 ;; To use this package, add following code to your init.el or .emacs
@@ -72,7 +72,7 @@ Set to nil if you put anzu in your mode-line manually."
   :type 'boolean)
 
 (defcustom anzu-mode-line-update-function #'anzu--update-mode-line-default
-  "Function which returns the mode-line string. This must be non-nil."
+  "Function which returns the mode-line string.  This must be non-nil."
   :type 'function)
 
 (defcustom anzu-regexp-search-commands '(isearch-forward-regexp
@@ -89,11 +89,11 @@ Set to nil if you put anzu in your mode-line manually."
   :type 'boolean)
 
 (defcustom anzu-replace-at-cursor-thing 'defun
-  "Thing to replace. See `thing-at-point' for valid options."
+  "Thing to replace.  See `thing-at-point' for valid options."
   :type 'symbol)
 
 (defcustom anzu-replace-to-string-separator ""
-  "Separator of `to' string"
+  "Separator of `to' string."
   :type 'string)
 
 (defface anzu-mode-line
@@ -555,7 +555,7 @@ Set to nil if you put anzu in your mode-line manually."
       (add-to-history query-replace-from-history-variable from nil t)
       (when use-regexp
         (unless (anzu--validate-regexp from)
-          (error "'%s' is an invalid regular expression." from))
+          (error "'%s' is an invalid regular expression" from))
         (anzu--query-validate-from-regexp from))
       from)))
 
@@ -740,8 +740,8 @@ Set to nil if you put anzu in your mode-line manually."
         (t nil)))
 
 (defun anzu--replace-backward-p (prefix)
-  ;; This variable is introduced at Emacs 24.4, I should fix this variable to
-  ;; version variable
+  ;; This variable was introduced in Emacs 24.4, I should fix this
+  ;; variable to version variable
   (and (boundp 'list-matching-lines-prefix-face)
        (and prefix (< prefix 0))))
 
@@ -856,7 +856,7 @@ Set to nil if you put anzu in your mode-line manually."
 
 ;;;###autoload
 (defun anzu-query-replace-at-cursor-thing ()
-  "Replace the thing at point, determined by `anzu-replace-at-cursor-thing'."
+  "Replace the thing at point, determined by variable `anzu-replace-at-cursor-thing'."
   (interactive)
   (anzu--query-replace-common t :at-cursor t :thing anzu-replace-at-cursor-thing))
 
