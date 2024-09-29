@@ -25,10 +25,10 @@
 
 ;; `anzu.el' is an Emacs port of `anzu.vim'.
 ;;
-;; `anzu.el' provides a minor mode which displays 'current match/total
-;; matches' in the mode-line in various search modes.  This makes it
-;; easy to understand how many matches there are in the current buffer
-;; for your search query.
+;; `anzu.el' provides a minor mode which displays the match count for
+;; various search commands in the mode-line, using the format
+;; `current/total'.  This makes it easy to know how many matches your
+;; search query has in the current buffer.
 
 ;; To use this package, add following code to your init.el or .emacs
 ;;
@@ -41,23 +41,24 @@
 (require 'thingatpt)
 
 (defgroup anzu nil
-  "Show searched position in mode-line"
+  "Show the current search's match count in the mode-line."
   :group 'isearch)
 
 (defcustom anzu-mode-lighter " Anzu"
-  "Lighter of anzu-mode"
+  "Mode-line lighter for `anzu-mode'."
   :type 'string)
 
 (defcustom anzu-cons-mode-line-p t
-  "Set nil if you use your own mode-line setting"
+  "Whether anzu should display itself in the mode-line.
+Set to nil if you put anzu in your mode-line manually."
   :type 'boolean)
 
 (defcustom anzu-minimum-input-length 1
-  "Minimum input length to enable anzu"
+  "Minimum search query length required to enable anzu."
   :type 'integer)
 
 (defcustom anzu-search-threshold 1000
-  "Limit of search number"
+  "Search match count limit."
   :type '(choice (integer :tag "Threshold of search")
                  (const :tag "No threshold" nil)))
 
@@ -67,45 +68,45 @@
                  (const :tag "No threshold" nil)))
 
 (defcustom anzu-use-migemo nil
-  "Flag of using migemo"
+  "Whether to use migemo."
   :type 'boolean)
 
 (defcustom anzu-mode-line-update-function #'anzu--update-mode-line-default
-  "Function which return mode-line string. This must be non-nil."
+  "Function which returns the mode-line string.  This must be non-nil."
   :type 'function)
 
 (defcustom anzu-regexp-search-commands '(isearch-forward-regexp
                                          isearch-backward-regexp)
-  "Search function which use regexp."
+  "Search functions which use regexp."
   :type '(repeat function))
 
 (defcustom anzu-input-idle-delay 0.05
-  "Idle second for updating modeline at replace commands"
+  "Delay in seconds between mode-line updates in replace commands."
   :type 'number)
 
 (defcustom anzu-deactivate-region nil
-  "Deactive region if you use anzu a replace command with region"
+  "Whether to deactivate region when anzu is used with a region replace command."
   :type 'boolean)
 
 (defcustom anzu-replace-at-cursor-thing 'defun
-  "Replace thing. This parameter is same as `thing-at-point'"
+  "Thing to replace.  See `thing-at-point' for valid options."
   :type 'symbol)
 
 (defcustom anzu-replace-to-string-separator ""
-  "Separator of `to' string"
+  "Separator of `to' string."
   :type 'string)
 
 (defface anzu-mode-line
   '((t (:foreground "magenta" :weight bold)))
-  "face of anzu modeline")
+  "Anzu's mode-line indicator face.")
 
 (defface anzu-mode-line-no-match
   '((t (:inherit anzu-mode-line)))
-  "face of anzu modeline in no match case")
+  "Anzu's mode-line indicator face, used when no matches are found.")
 
 (defface anzu-replace-highlight
   '((t :inherit query-replace))
-  "highlight of replaced string")
+  "Replacement highlighting face.")
 
 (defface anzu-match-1
   '((((class color) (background light))
@@ -136,7 +137,7 @@
      :foreground "red")
     (((class color) (background dark))
      :foreground "yellow"))
-  "highlight of replace string")
+  "Replacement highlighting face.")
 
 (defvar anzu--total-matched 0)
 (defvar anzu--current-position 0)
@@ -307,7 +308,7 @@
 
 ;;;###autoload
 (define-minor-mode anzu-mode
-  "minor-mode which display search information in mode-line."
+  "Minor mode which displays the current search's match count in the mode-line."
   :init-value nil
   :global     nil
   :lighter    anzu-mode-lighter
@@ -554,7 +555,7 @@
       (add-to-history query-replace-from-history-variable from nil t)
       (when use-regexp
         (unless (anzu--validate-regexp from)
-          (error "'%s' is invalid regexp." from))
+          (error "'%s' is an invalid regular expression" from))
         (anzu--query-validate-from-regexp from))
       from)))
 
@@ -739,8 +740,8 @@
         (t nil)))
 
 (defun anzu--replace-backward-p (prefix)
-  ;; This variable is introduced at Emacs 24.4, I should fix this variable to
-  ;; version variable
+  ;; This variable was introduced in Emacs 24.4, I should fix this
+  ;; variable to version variable
   (and (boundp 'list-matching-lines-prefix-face)
        (and prefix (< prefix 0))))
 
@@ -849,31 +850,31 @@
 
 ;;;###autoload
 (defun anzu-query-replace-at-cursor ()
-  "Replace symbol at cursor with to-string."
+  "Replace the symbol at point."
   (interactive)
   (anzu--query-replace-common t :at-cursor t))
 
 ;;;###autoload
 (defun anzu-query-replace-at-cursor-thing ()
-  "Replace symbol at cursor within `anzu-replace-at-cursor-thing' area."
+  "Replace the thing at point, determined by variable `anzu-replace-at-cursor-thing'."
   (interactive)
   (anzu--query-replace-common t :at-cursor t :thing anzu-replace-at-cursor-thing))
 
 ;;;###autoload
 (defun anzu-query-replace (arg)
-  "anzu version of `query-replace'."
+  "Anzu version of `query-replace'."
   (interactive "p")
   (anzu--query-replace-common nil :prefix-arg arg))
 
 ;;;###autoload
 (defun anzu-query-replace-regexp (arg)
-  "anzu version of `query-replace-regexp'."
+  "Anzu version of `query-replace-regexp'."
   (interactive "p")
   (anzu--query-replace-common t :prefix-arg arg))
 
 ;;;###autoload
 (defun anzu-replace-at-cursor-thing ()
-  "anzu-query-replace-at-cursor-thing without query."
+  "Like `anzu-query-replace-at-cursor-thing', but without the query."
   (interactive)
   (let ((orig (point-marker)))
     (anzu--query-replace-common t
@@ -901,13 +902,13 @@
 
 ;;;###autoload
 (defun anzu-isearch-query-replace (arg)
-  "anzu version of `isearch-query-replace'."
+  "Anzu version of `isearch-query-replace'."
   (interactive "p")
   (anzu--isearch-query-replace-common nil arg))
 
 ;;;###autoload
 (defun anzu-isearch-query-replace-regexp (arg)
-  "anzu version of `isearch-query-replace-regexp'."
+  "Anzu version of `isearch-query-replace-regexp'."
   (interactive "p")
   (anzu--isearch-query-replace-common t arg))
 
