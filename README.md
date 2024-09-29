@@ -12,10 +12,9 @@ information in the mode-line in various search modes.
 
 ## New Maintainer
 
-This package has a new maintainer as of March 2020, and based on the
-valuable contribution of insights and fixes from the author, you
-should see issues from years past are now getting resolved.  You may
-also see instability in the short term.  Please bear with us!
+This package has a new maintainer as of 2024, @LemonBreezes. If you have any
+questions or concerns, please feel free to open an issue on GitHub or to send me
+an email.
 
 ## Screenshot
 
