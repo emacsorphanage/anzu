@@ -3,10 +3,12 @@
 ;; Copyright (C) 2016-2020 Syohei YOSHIDA and Neil Okamoto
 
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
-;; Maintainer: Neil Okamoto <neil.okamoto+melpa@gmail.com>
-;; URL: https://github.com/emacsorphanage/anzu
+;; Maintainer: LemonBreezes <look@strawberrytea.xyz>
+;; Homepage: https://github.com/emacsorphanage/anzu
 ;; Version: 0.65
 ;; Package-Requires: ((emacs "25.1"))
+
+;; This file is part of GNU Emacs.
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
