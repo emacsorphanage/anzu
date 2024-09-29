@@ -5,7 +5,7 @@
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; Maintainer: LemonBreezes <look@strawberrytea.xyz>
 ;; Homepage: https://github.com/emacsorphanage/anzu
-;; Version: 0.65
+;; Version: 0.66
 ;; Package-Requires: ((emacs "25.1"))
 
 ;; This file is part of GNU Emacs.
